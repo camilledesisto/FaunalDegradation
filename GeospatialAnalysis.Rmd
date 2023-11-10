@@ -1,0 +1,651 @@
+---
+title: "AGB_Change_Covs"
+author: "Camille"
+date: "4/3/2023"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r Import Data}
+library(ggplot2);library(MuMIn);library(corrplot);library(lme4);library(scales);library(tidyverse);library(ggpubr)
+#Observed Network 
+simdat_nr_obs <- read.csv("~/Documents/GitHub/FaunalDegradationAGB/Outputs/Observed/total/no_redundancy/output.csv")
+simdat_obs <- read.csv("~/Documents/GitHub/FaunalDegradationAGB/Outputs/Observed/total/no_redundancy/output.csv")
+simdat_ele_obs <- read.csv("~/Documents/GitHub/FaunalDegradationAGB/Outputs/Observed/ele/redundancy/output.csv")
+simdat_ele_nr_obs <- read.csv("~/Documents/GitHub/FaunalDegradationAGB/Outputs/Observed/ele/no_redundancy/output.csv")
+simdat_ceph_obs <- read.csv("~/Documents/GitHub/FaunalDegradationAGB/Outputs/Observed/ceph/redundancy/output.csv")
+simdat_ceph_nr_obs <-read.csv("~/Documents/GitHub/FaunalDegradationAGB/Outputs/Observed/ceph/no_redundancy/output.csv")
+simdat_monkey_obs <- read.csv("~/Documents/GitHub/FaunalDegradationAGB/Outputs/Observed/monkey/redundancy/output.csv")
+simdat_monkey_nr_obs <- read.csv("~/Documents/GitHub/FaunalDegradationAGB/Outputs/Observed/monkey/no_redundancy/output.csv")
+simdat_smam_obs <- read.csv("~/Documents/GitHub/FaunalDegradationAGB/Outputs/Observed/smam/redundancy/output.csv")
+simdat_smam_nr_obs <- read.csv("~/Documents/GitHub/FaunalDegradationAGB/Outputs/Observed/smam/no_redundancy/output.csv")
+simdat_ape_obs <-read.csv("~/Documents/GitHub/FaunalDegradationAGB/Outputs/Observed/ape/redundancy/output.csv")
+simdat_ape_nr_obs <- read.csv("~/Documents/GitHub/FaunalDegradationAGB/Outputs/Observed/ape/no_redundancy/output.csv")
+
+
+#Imputed Network 
+simdat <- read.csv("/Users/camilledesisto/Documents/GitHub/FaunalDegradationagb/SummaryOutputs/plot_simulations_imputed_nr.csv")
+simdat_nr <- read.csv("/Users/camilledesisto/Documents/GitHub/FaunalDegradationagb/SummaryOutputs/plot_simulations_imputed_nr.csv")
+
+simdat_ele <- read.csv("/Users/camilledesisto/Documents/GitHub/FaunalDegradationagb/SummaryOutputs/plot_simulations_imputed_ele.csv")
+simdat_ele_nr <- read.csv("/Users/camilledesisto/Documents/GitHub/FaunalDegradationagb/SummaryOutputs/plot_simulations_imputed_ele_nr.csv")
+
+simdat_ape <- read.csv("/Users/camilledesisto/Documents/GitHub/FaunalDegradationagb/SummaryOutputs/plot_simulations_imputed_ape.csv")
+simdat_ape_nr <- read.csv("/Users/camilledesisto/Documents/GitHub/FaunalDegradationagb/SummaryOutputs/plot_simulations_imputed_ape_nr.csv")
+
+simdat_monkey <- read.csv("/Users/camilledesisto/Documents/GitHub/FaunalDegradationagb/SummaryOutputs/plot_simulations_imputed_monkey.csv")
+simdat_monkey_nr <- read.csv("/Users/camilledesisto/Documents/GitHub/FaunalDegradationagb/SummaryOutputs/plot_simulations_imputed_monkey_nr.csv")
+
+simdat_ceph <- read.csv("/Users/camilledesisto/Documents/GitHub/FaunalDegradationagb/SummaryOutputs/plot_simulations_imputed_ceph.csv")
+simdat_ceph_nr <- read.csv("/Users/camilledesisto/Documents/GitHub/FaunalDegradationagb/SummaryOutputs/plot_simulations_imputed_ceph_nr.csv")
+
+simdat_smam <- read.csv("/Users/camilledesisto/Documents/GitHub/FaunalDegradationagb/SummaryOutputs/plot_simulations_imputed_smam.csv")
+simdat_smam_nr <- read.csv("/Users/camilledesisto/Documents/GitHub/FaunalDegradationagb/SummaryOutputs/plot_simulations_imputed_smam_nr.csv")
+
+
+
+```
+
+
+```{r Organize Data Frames}
+#Imputed Network
+simdat_ele$Taxa <- "Elephant"
+simdat_ele_nr$Taxa <- "Elephant"
+simdat_monkey$Taxa <- "Monkey"
+simdat_monkey_nr$Taxa <- "Monkey"
+simdat_ape$Taxa <- "Ape"
+simdat_ape_nr$Taxa <- "Ape"
+simdat_ceph$Taxa <- "Duiker"
+simdat_ceph_nr$Taxa <- "Duiker"
+simdat_smam$Taxa <- "Rodent"
+simdat_smam_nr$Taxa <- "Rodent"
+simdat$Taxa <- "Total"
+simdat_nr$Taxa <- "Total"
+
+colnames(simdat_ape)[2] <- "DispoCode"
+colnames(simdat_ele)[2] <- "DispoCode"
+colnames(simdat_monkey)[2] <- "DispoCode"
+colnames(simdat_ceph)[2] <- "DispoCode"
+colnames(simdat_smam)[2] <- "DispoCode"
+colnames(simdat)[2] <- "DispoCode"
+
+colnames(simdat_ape_nr)[2] <- "DispoCode"
+colnames(simdat_ele_nr)[2] <- "DispoCode"
+colnames(simdat_monkey_nr)[2] <- "DispoCode"
+colnames(simdat_ceph_nr)[2] <- "DispoCode"
+colnames(simdat_smam_nr)[2] <- "DispoCode"
+colnames(simdat_nr)[2] <- "DispoCode"
+
+colnames(simdat_ape)
+colnames(simdat_ele)
+colnames(simdat_monkey)
+colnames(simdat_ceph)
+colnames(simdat_smam)
+colnames(simdat)
+
+simdat_total <- rbind(simdat_ape, simdat_ele, simdat_monkey, simdat_ceph, simdat_smam, simdat)
+colnames(simdat_total)[3] <- c("Iteration")
+
+simdat_total_nr <- rbind(simdat_ape_nr, simdat_ele_nr, simdat_monkey_nr, simdat_smam_nr, simdat_ceph_nr, simdat_nr)
+colnames(simdat_total_nr)[3] <- c("Iteration")
+
+covs <- read.csv("~/Documents/GitHub/FaunalDegradationAGB/Data/model-data.csv")
+covs$Succession[covs$Succession=="Secondaire exploite"] <- "Secondaire"
+covs2 <- covs %>% select(DispoCode, Latitude, VillDist, Elev, Prec, Succession)
+covs2$Latitude <- scale(covs2$Latitude)
+covs2$VillDist <- scale(covs2$VillDist)
+covs2$Elev <- scale(covs2$Elev)
+covs2$Prec <- scale(covs2$Prec)
+
+simdat_total
+
+simdat_total2 <- left_join(covs2, simdat_total, by="DispoCode")
+simdat_total2 <- simdat_total2 %>% filter(PercentRemoved==50)
+simdat_total2$AGB <- simdat_total2$AGB * -1
+simdat_total2$Succession[simdat_total2$Succession=="Primaire"] <- "aPrimaire"
+
+simdat_total_nr2 <- left_join(covs2, simdat_total_nr, by="DispoCode")
+simdat_total_nr2 <- simdat_total_nr2 %>% filter(PercentRemoved==50)
+simdat_total_nr2$AGB <- simdat_total_nr2$AGB * -1
+simdat_total_nr2$Succession[simdat_total_nr2$Succession=="Primaire"] <- "aPrimaire"
+
+```
+
+
+```{r Organize Data Frames}
+#Observed Network
+simdat_ele_obs$Taxa <- "Elephant"
+simdat_ele_nr_obs$Taxa <- "Elephant"
+simdat_monkey_obs$Taxa <- "Monkey"
+simdat_monkey_nr_obs$Taxa <- "Monkey"
+simdat_ape_obs$Taxa <- "Ape"
+simdat_ape_nr_obs$Taxa <- "Ape"
+simdat_ceph_obs$Taxa <- "Duiker"
+simdat_ceph_nr_obs$Taxa <- "Duiker"
+simdat_smam_obs$Taxa <- "Rodent"
+simdat_smam_nr_obs$Taxa <- "Rodent"
+simdat_obs$Taxa <- "Total"
+simdat_nr_obs$Taxa <- "Total"
+
+colnames(simdat_ape_obs)[3] <-"DispoCode"
+colnames(simdat_ele_obs)[3] <- "DispoCode"
+colnames(simdat_monkey_obs)[3] <- "DispoCode"
+colnames(simdat_ceph_obs)[3] <- "DispoCode"
+colnames(simdat_smam_obs)[3] <- "DispoCode"
+colnames(simdat_obs)[3] <- "DispoCode"
+
+colnames(simdat_ape_nr_obs)[3] <- "DispoCode"
+colnames(simdat_ele_nr_obs)[3] <- "DispoCode"
+colnames(simdat_monkey_nr_obs)[3] <-"DispoCode"
+colnames(simdat_ceph_nr_obs)[3] <- "DispoCode"
+colnames(simdat_smam_nr_obs)[3] <-"DispoCode"
+colnames(simdat_nr_obs)[3] <- "DispoCode"
+
+simdat_total_obs <- rbind(simdat_ape_obs, simdat_ele_obs, simdat_monkey_obs, simdat_ceph_obs, simdat_smam_obs, simdat_obs)
+
+simdat_total_nr_obs <- rbind(simdat_ape_nr_obs, simdat_ele_nr_obs, simdat_monkey_nr_obs, simdat_smam_nr_obs, simdat_ceph_nr_obs, simdat_nr_obs)
+
+simdat_total2_obs <- left_join(covs2, simdat_total_obs, by="DispoCode")
+simdat_total2_obs <- simdat_total2_obs %>% filter(PercentRemoved==50)
+simdat_total2_obs$AGB <- simdat_total2_obs$AGB * -1
+simdat_total2_obs$Succession[simdat_total2_obs$Succession=="Primaire"] <- "aPrimaire"
+
+simdat_total2_nr_obs <- left_join(covs2, simdat_total_nr_obs, by="DispoCode")
+simdat_total2_nr_obs <- simdat_total2_nr_obs %>% filter(PercentRemoved==50)
+simdat_total2_nr_obs$AGB <- simdat_total2_nr_obs$AGB * -1
+simdat_total2_nr_obs$Succession[simdat_total2_nr_obs$Succession=="Primaire"] <- "aPrimaire"
+simdat_total2_nr_obs$Succession[simdat_total2_nr_obs$Succession=="Secondaire exploite"] <-"Secondaire"
+```
+
+```{r Linear Models: Imputed}
+# Total 
+simdat_sample <- simdat_total2 %>% filter(Taxa=="Total") %>% group_by(DispoCode)
+simdat_mod <- step(lm(data=simdat_sample, AGB ~ Latitude + VillDist+ Elev +Prec+Succession))
+simdat_mod2 <- summary(simdat_mod)
+confint_total <- as.data.frame(confint(simdat_mod))
+confint_total$Taxa <- "Total"
+
+# Elephants 
+simdat_sample <- simdat_total2 %>% filter(Taxa=="Elephant") %>% group_by(DispoCode)
+simdat_mod <- step(lm(data=simdat_sample, AGB ~ Latitude + VillDist+ Elev +Prec+Succession))
+simdat_mod2 <- summary(simdat_mod)
+confint_ele <- as.data.frame(confint(simdat_mod))
+confint_ele$Taxa <- "Elephant"
+
+# Ape
+simdat_sample <- simdat_total2 %>% filter(Taxa=="Ape") %>% group_by(DispoCode)
+simdat_mod <- step(lm(data=simdat_sample, AGB ~ Latitude + VillDist+ Elev +Prec+Succession))
+simdat_mod2 <- summary(simdat_mod)
+confint_ape <- as.data.frame(confint(simdat_mod))
+confint_ape$Taxa <- "Ape"
+
+# Monkey
+simdat_sample <- simdat_total2 %>% filter(Taxa=="Monkey") %>% group_by(DispoCode)
+simdat_mod <- step(lm(data=simdat_sample, AGB ~ Latitude + VillDist+ Elev +Prec+Succession))
+simdat_mod2 <- summary(simdat_mod)
+confint_monkey <- as.data.frame(confint(simdat_mod))
+confint_monkey$Taxa <- "Monkey"
+
+# Duiker
+simdat_sample <- simdat_total2 %>% filter(Taxa=="Duiker") %>% group_by(DispoCode)
+simdat_mod <- step(lm(data=simdat_sample, AGB ~ Latitude + VillDist+ Elev +Prec+Succession))
+simdat_mod2 <- summary(simdat_mod)
+confint_ceph <- as.data.frame(confint(simdat_mod))
+confint_ceph$Taxa <- "Duiker"
+
+# Smam
+simdat_sample <- simdat_total2 %>% filter(Taxa=="Rodent") %>% group_by(DispoCode)
+simdat_mod <- step(lm(data=simdat_sample, AGB ~ Latitude + VillDist+ Elev +Prec+Succession))
+simdat_mod2 <- summary(simdat_mod)
+confint_smam <- as.data.frame(confint(simdat_mod))
+confint_smam$Taxa <- "Rodent"
+
+```
+
+```{r Linear Models: Imputed, No Compensation}
+# Total 
+simdat_sample <- simdat_total_nr2 %>% filter(Taxa=="Total") %>% group_by(DispoCode)
+simdat_mod <- step(lm(data=simdat_sample, AGB ~ Latitude + VillDist+ Elev +Prec+Succession))
+simdat_mod2 <- summary(simdat_mod)
+confint_total_nr <- as.data.frame(confint(simdat_mod))
+confint_total_nr$Taxa <- "Total"
+
+# Elephants 
+simdat_sample <- simdat_total_nr2 %>% filter(Taxa=="Elephant") %>% group_by(DispoCode)
+simdat_mod <- step(lm(data=simdat_sample, AGB ~ Latitude + VillDist+ Elev +Prec+Succession))
+simdat_mod2 <- summary(simdat_mod)
+confint_ele_nr <- as.data.frame(confint(simdat_mod))
+confint_ele_nr$Taxa <- "Elephant"
+
+# Ape
+simdat_sample <- simdat_total_nr2 %>% filter(Taxa=="Ape") %>% group_by(DispoCode)
+simdat_mod <- step(lm(data=simdat_sample, AGB ~ Latitude + VillDist+ Elev +Prec+Succession))
+simdat_mod2 <- summary(simdat_mod)
+confint_ape_nr <- as.data.frame(confint(simdat_mod))
+confint_ape_nr$Taxa <- "Ape"
+
+# Monkey
+simdat_sample <- simdat_total_nr2 %>% filter(Taxa=="Monkey") %>% group_by(DispoCode)
+simdat_mod <- step(lm(data=simdat_sample, AGB ~ Latitude + VillDist+ Elev +Prec+Succession))
+simdat_mod2 <- summary(simdat_mod)
+confint_monkey_nr <- as.data.frame(confint(simdat_mod))
+confint_monkey_nr$Taxa <- "Monkey"
+
+# Duiker
+simdat_sample <- simdat_total_nr2 %>% filter(Taxa=="Duiker") %>% group_by(DispoCode)
+simdat_mod <- step(lm(data=simdat_sample, AGB ~ Latitude + VillDist+ Elev +Prec+Succession))
+simdat_mod2 <- summary(simdat_mod)
+confint_ceph_nr <- as.data.frame(confint(simdat_mod))
+confint_ceph_nr$Taxa <- "Duiker"
+
+# Smam
+simdat_sample <- simdat_total_nr2 %>% filter(Taxa=="Rodent") %>% group_by(DispoCode)
+simdat_mod <- step(lm(data=simdat_sample, AGB ~ Latitude + VillDist+ Elev +Prec+Succession))
+simdat_mod2 <- summary(simdat_mod)
+confint_smam_nr <- as.data.frame(confint(simdat_mod))
+confint_smam_nr$Taxa <- "Rodent"
+
+```
+
+```{r Linear Models: Observed}
+# Total 
+simdat_sample <- simdat_total2_obs %>% filter(Taxa=="Total") %>% group_by(DispoCode)
+simdat_mod <- step(lm(data=simdat_sample, AGB ~ Latitude + VillDist+ Elev +Prec+Succession))
+simdat_mod2 <- summary(simdat_mod)
+confint_total_obs <- as.data.frame(confint(simdat_mod))
+confint_total_obs$Taxa <- "Total"
+
+# Elephants 
+simdat_sample <- simdat_total2_obs %>% filter(Taxa=="Elephant") %>% group_by(DispoCode)
+simdat_mod <- step(lm(data=simdat_sample, AGB ~ Latitude + VillDist+ Elev +Prec+Succession))
+simdat_mod2 <- summary(simdat_mod)
+confint_ele_obs <- as.data.frame(confint(simdat_mod))
+confint_ele_obs$Taxa <- "Elephant"
+
+# Ape
+simdat_sample <- simdat_total2_obs %>% filter(Taxa=="Ape") %>% group_by(DispoCode)
+simdat_mod <- step(lm(data=simdat_sample, AGB ~ Latitude + VillDist+ Elev +Prec+Succession))
+simdat_mod2 <- summary(simdat_mod)
+confint_ape_obs <- as.data.frame(confint(simdat_mod))
+confint_ape_obs$Taxa <- "Ape"
+
+# Monkey
+simdat_sample <- simdat_total2_obs %>% filter(Taxa=="Monkey") %>% group_by(DispoCode)
+simdat_mod <- step(lm(data=simdat_sample, AGB ~ Latitude + VillDist+ Elev +Prec+Succession))
+simdat_mod2 <- summary(simdat_mod)
+confint_monkey_obs <- as.data.frame(confint(simdat_mod))
+confint_monkey_obs$Taxa <- "Monkey"
+
+# Duiker
+simdat_sample <- simdat_total2_obs %>% filter(Taxa=="Duiker") %>% group_by(DispoCode)
+simdat_mod <- step(lm(data=simdat_sample, AGB ~ Latitude + VillDist+ Elev +Prec+Succession))
+simdat_mod2 <- summary(simdat_mod)
+confint_ceph_obs <- as.data.frame(confint(simdat_mod))
+confint_ceph_obs$Taxa <- "Duiker"
+
+# Smam
+simdat_sample <- simdat_total2_obs %>% filter(Taxa=="Rodent") %>% group_by(DispoCode)
+simdat_mod <- step(lm(data=simdat_sample, AGB ~ Latitude + VillDist+ Elev +Prec+Succession))
+simdat_mod2 <- summary(simdat_mod)
+confint_smam_obs <- as.data.frame(confint(simdat_mod))
+confint_smam_obs$Taxa <- "Rodent"
+
+```
+
+```{r Linear Models: Observed, No Compensation}
+# Total 
+simdat_sample <- simdat_total2_nr_obs %>% filter(Taxa=="Total") %>% group_by(DispoCode)
+simdat_mod <- step(lm(data=simdat_sample, AGB ~ Latitude + VillDist+ Elev +Prec+Succession))
+simdat_mod2 <- summary(simdat_mod)
+confint_total_nr_obs <- as.data.frame(confint(simdat_mod))
+confint_total_nr_obs$Taxa <- "Total"
+
+# Elephants 
+simdat_sample <-simdat_total2_nr_obs %>% filter(Taxa=="Elephant") %>% group_by(DispoCode)
+simdat_mod <- step(lm(data=simdat_sample, AGB ~ Latitude + VillDist+ Elev +Prec+Succession))
+simdat_mod2 <- summary(simdat_mod)
+confint_ele_nr_obs <- as.data.frame(confint(simdat_mod))
+confint_ele_nr_obs$Taxa <- "Elephant"
+
+# Ape
+simdat_sample <- simdat_total2_nr_obs %>% filter(Taxa=="Ape") %>% group_by(DispoCode)
+simdat_mod <- step(lm(data=simdat_sample, AGB ~ Latitude + VillDist+ Elev +Prec+Succession))
+simdat_mod2 <- summary(simdat_mod)
+confint_ape_nr_obs <- as.data.frame(confint(simdat_mod))
+confint_ape_nr_obs$Taxa <- "Ape"
+
+# Monkey
+simdat_sample <- simdat_total2_nr_obs %>% filter(Taxa=="Monkey") %>% group_by(DispoCode)
+simdat_mod <- step(lm(data=simdat_sample, AGB ~ Latitude + VillDist+ Elev +Prec+Succession))
+simdat_mod2 <- summary(simdat_mod)
+confint_monkey_nr_obs <- as.data.frame(confint(simdat_mod))
+confint_monkey_nr_obs$Taxa <- "Monkey"
+
+# Duiker
+simdat_sample <- simdat_total2_nr_obs %>% filter(Taxa=="Duiker") %>% group_by(DispoCode)
+simdat_mod <- step(lm(data=simdat_sample, AGB ~ Latitude + VillDist+ Elev +Prec+Succession))
+simdat_mod2 <- summary(simdat_mod)
+confint_ceph_nr_obs <- as.data.frame(confint(simdat_mod))
+confint_ceph_nr_obs$Taxa <- "Duiker"
+
+# Smam
+simdat_sample <- simdat_total2_nr_obs %>% filter(Taxa=="Rodent") %>% group_by(DispoCode)
+simdat_mod <- step(lm(data=simdat_sample, AGB ~ Latitude + VillDist+ Elev +Prec+Succession))
+simdat_mod2 <- summary(simdat_mod)
+confint_smam_nr_obs <- as.data.frame(confint(simdat_mod))
+confint_smam_nr_obs$Taxa <- "Rodent"
+
+```
+
+```{r Total Dataframe Compilation}
+#Imputed Network
+confint_all_r <- rbind(confint_total, confint_ele, confint_ape, confint_monkey, confint_smam, confint_ceph)
+confint_all_r$Network <- "Imputed, Compensation"
+confint_all_nr <- rbind(confint_total_nr, confint_ele_nr, confint_ape_nr, confint_monkey_nr, confint_smam_nr, confint_ceph_nr)
+confint_all_nr$Network <- "Imputed, No Compensation"
+confint_all <- rbind(confint_all_r, confint_all_nr)
+confint_all$Variable <- rownames(confint_all)
+
+colnames(confint_all)[1] <- "Lower"
+colnames(confint_all)[2] <- "Upper"
+confint_all$Estimate <- (confint_all$Lower +confint_all$Upper)/2
+
+confint_all$Variable[confint_all$Variable=="(Intercept)"] <-"(Intercept)" 
+confint_all$Variable[confint_all$Variable=="(Intercept)1"] <-"(Intercept)" 
+confint_all$Variable[confint_all$Variable=="(Intercept)2"] <-"(Intercept)" 
+confint_all$Variable[confint_all$Variable=="(Intercept)3"] <-"(Intercept)" 
+confint_all$Variable[confint_all$Variable=="(Intercept)4"] <-"(Intercept)" 
+confint_all$Variable[confint_all$Variable=="(Intercept)6"] <-"(Intercept)" 
+confint_all$Variable[confint_all$Variable=="(Intercept)11"] <-"(Intercept)" 
+confint_all$Variable[confint_all$Variable=="(Intercept)21"] <-"(Intercept)" 
+confint_all$Variable[confint_all$Variable=="(Intercept)31"] <-"(Intercept)" 
+confint_all$Variable[confint_all$Variable=="(Intercept)41"] <-"(Intercept)" 
+confint_all$Variable[confint_all$Variable=="(Intercept)51"] <-"(Intercept)" 
+confint_all$Variable[confint_all$Variable=="Elev"] <-"Elevation" 
+confint_all$Variable[confint_all$Variable=="Elev1"] <-"Elevation"
+confint_all$Variable[confint_all$Variable=="Elev2"] <-"Elevation" 
+confint_all$Variable[confint_all$Variable=="Elev3"] <-"Elevation" 
+confint_all$Variable[confint_all$Variable=="Elev4"] <-"Elevation" 
+confint_all$Variable[confint_all$Variable=="Elev5"] <-"Elevation" 
+confint_all$Variable[confint_all$Variable=="Elev6"] <-"Elevation" 
+confint_all$Variable[confint_all$Variable=="Elev11"] <-"Elevation" 
+confint_all$Variable[confint_all$Variable=="Elev21"] <-"Elevation" 
+confint_all$Variable[confint_all$Variable=="Elev31"] <-"Elevation" 
+confint_all$Variable[confint_all$Variable=="Elev41"] <-"Elevation" 
+confint_all$Variable[confint_all$Variable=="Elev51"] <-"Elevation" 
+confint_all$Variable[confint_all$Variable=="Prec"] <-"Precipitation" 
+confint_all$Variable[confint_all$Variable=="Prec1"] <-"Precipitation" 
+confint_all$Variable[confint_all$Variable=="Prec2"] <-"Precipitation" 
+confint_all$Variable[confint_all$Variable=="Prec3"] <-"Precipitation" 
+confint_all$Variable[confint_all$Variable=="Prec4"] <-"Precipitation" 
+confint_all$Variable[confint_all$Variable=="Prec5"] <-"Precipitation" 
+confint_all$Variable[confint_all$Variable=="Prec6"] <-"Precipitation" 
+confint_all$Variable[confint_all$Variable=="Prec11"] <-"Precipitation" 
+confint_all$Variable[confint_all$Variable=="Prec21"] <-"Precipitation" 
+confint_all$Variable[confint_all$Variable=="Prec31"] <-"Precipitation" 
+confint_all$Variable[confint_all$Variable=="Prec41"] <-"Precipitation" 
+confint_all$Variable[confint_all$Variable=="Prec51"] <-"Precipitation" 
+confint_all$Variable[confint_all$Variable=="Latitude"] <-"Latitude"
+confint_all$Variable[confint_all$Variable=="Latitude1"] <-"Latitude"
+confint_all$Variable[confint_all$Variable=="Latitude2"] <-"Latitude"
+confint_all$Variable[confint_all$Variable=="Latitude3"] <-"Latitude"
+confint_all$Variable[confint_all$Variable=="Latitude4"] <-"Latitude"
+confint_all$Variable[confint_all$Variable=="Latitude5"] <-"Latitude"
+confint_all$Variable[confint_all$Variable=="Latitude6"] <-"Latitude"
+confint_all$Variable[confint_all$Variable=="Latitude11"] <-"Latitude"
+confint_all$Variable[confint_all$Variable=="Latitude21"] <-"Latitude"
+confint_all$Variable[confint_all$Variable=="Latitude31"] <-"Latitude"
+confint_all$Variable[confint_all$Variable=="Latitude41"] <-"Latitude"
+confint_all$Variable[confint_all$Variable=="Latitude51"] <-"Latitude"
+confint_all$Variable[confint_all$Variable=="VillDist"] <-"Village Dist."
+confint_all$Variable[confint_all$Variable=="VillDist1"] <-"Village Dist."
+confint_all$Variable[confint_all$Variable=="VillDist2"] <-"Village Dist."
+confint_all$Variable[confint_all$Variable=="VillDist3"] <-"Village Dist."
+confint_all$Variable[confint_all$Variable=="VillDist4"] <-"Village Dist."
+confint_all$Variable[confint_all$Variable=="SuccessionExploitee"] <-"Logged Forest"
+confint_all$Variable[confint_all$Variable=="SuccessionExploitee1"] <-"Logged Forest"
+confint_all$Variable[confint_all$Variable=="SuccessionExploitee2"] <-"Logged Forest"
+confint_all$Variable[confint_all$Variable=="SuccessionExploitee3"] <-"Logged Forest"
+confint_all$Variable[confint_all$Variable=="SuccessionExploitee4"] <-"Logged Forest"
+confint_all$Variable[confint_all$Variable=="SuccessionExploitee5"] <-"Logged Forest"
+confint_all$Variable[confint_all$Variable=="SuccessionExploitee6"] <-"Logged Forest"
+confint_all$Variable[confint_all$Variable=="SuccessionExploitee11"] <-"Logged Forest"
+confint_all$Variable[confint_all$Variable=="SuccessionExploitee21"] <-"Logged Forest"
+confint_all$Variable[confint_all$Variable=="SuccessionExploitee31"] <-"Logged Forest"
+confint_all$Variable[confint_all$Variable=="SuccessionExploitee41"] <-"Logged Forest"
+confint_all$Variable[confint_all$Variable=="SuccessionExploitee51"] <-"Logged Forest"
+confint_all$Variable[confint_all$Variable=="SuccessionSecondaire"] <-"Secondary Forest"
+confint_all$Variable[confint_all$Variable=="SuccessionSecondaire1"] <-"Secondary Forest"
+confint_all$Variable[confint_all$Variable=="SuccessionSecondaire2"] <-"Secondary Forest"
+confint_all$Variable[confint_all$Variable=="SuccessionSecondaire3"] <-"Secondary Forest"
+confint_all$Variable[confint_all$Variable=="SuccessionSecondaire4"] <-"Secondary Forest"
+confint_all$Variable[confint_all$Variable=="SuccessionSecondaire5"] <-"Secondary Forest"
+confint_all$Variable[confint_all$Variable=="SuccessionSecondaire6"] <-"Secondary Forest"
+confint_all$Variable[confint_all$Variable=="SuccessionSecondaire11"] <-"Secondary Forest"
+confint_all$Variable[confint_all$Variable=="SuccessionSecondaire21"] <-"Secondary Forest"
+confint_all$Variable[confint_all$Variable=="SuccessionSecondaire31"] <-"Secondary Forest"
+confint_all$Variable[confint_all$Variable=="SuccessionSecondaire41"] <-"Secondary Forest"
+confint_all$Variable[confint_all$Variable=="SuccessionSecondaire51"] <-"Secondary Forest"
+confint_all$Variable[confint_all$Variable=="VillDist5"] <-"Village Dist."
+confint_all$Variable[confint_all$Variable=="VillDist6"] <-"Village Dist."
+confint_all$Variable[confint_all$Variable=="VillDist11"] <-"Village Dist."
+confint_all$Variable[confint_all$Variable=="VillDist21"] <-"Village Dist."
+confint_all$Variable[confint_all$Variable=="VillDist31"] <-"Village Dist."
+confint_all$Variable[confint_all$Variable=="VillDist41"] <-"Village Dist."
+confint_all$Variable[confint_all$Variable=="VillDist51"] <-"Village Dist."
+confint_all$Variable[confint_all$Variable=="(Intercept)5"] <-"(Intercept)"
+confint_all$Model <- "Imputed"
+
+confint_all$VariableType[confint_all$Variable=="(Intercept)"] <-"Intercept" 
+confint_all$VariableType[confint_all$Variable=="Elevation"] <-"Natural" 
+confint_all$VariableType[confint_all$Variable=="Latitude"] <-"Natural"
+confint_all$VariableType[confint_all$Variable=="Village Dist."] <-"Anthropogenic"
+confint_all$VariableType[confint_all$Variable=="Logged Forest"] <-"Anthropogenic"
+confint_all$VariableType[confint_all$Variable=="Precipitation"] <-"Natural"
+confint_all$VariableType[confint_all$Variable=="Secondary Forest"] <-"Anthropogenic"
+
+```
+
+
+```{r Total Dataframe Compilation}
+#Observed Network
+confint_obs_r <- rbind(confint_total_obs, confint_ele_obs, confint_ape_obs, confint_monkey_obs, confint_smam_obs, confint_ceph_obs)
+confint_obs_r$Network <- "Observed, Compensation"
+confint_obs_nr <- rbind(confint_total_nr_obs, confint_ele_nr_obs, confint_ape_nr_obs, confint_monkey_nr_obs, confint_smam_nr_obs, confint_ceph_nr_obs)
+confint_obs_nr$Network <- "Observed, No Compensation"
+
+confint_obs <- rbind(confint_obs_r, confint_obs_nr)
+
+confint_obs$Variable <- rownames(confint_obs)
+colnames(confint_obs)[1] <- "Lower"
+colnames(confint_obs)[2] <- "Upper"
+confint_obs$Estimate <- (confint_obs$Lower +confint_obs$Upper)/2
+
+confint_obs$Variable[confint_obs$Variable=="(Intercept)"] <-"(Intercept)" 
+confint_obs$Variable[confint_obs$Variable=="(Intercept)1"] <-"(Intercept)" 
+confint_obs$Variable[confint_obs$Variable=="(Intercept)2"] <-"(Intercept)" 
+confint_obs$Variable[confint_obs$Variable=="(Intercept)3"] <-"(Intercept)" 
+confint_obs$Variable[confint_obs$Variable=="(Intercept)4"] <-"(Intercept)" 
+confint_obs$Variable[confint_obs$Variable=="(Intercept)6"] <-"(Intercept)" 
+confint_obs$Variable[confint_obs$Variable=="(Intercept)11"] <-"(Intercept)" 
+confint_obs$Variable[confint_obs$Variable=="(Intercept)21"] <-"(Intercept)" 
+confint_obs$Variable[confint_obs$Variable=="(Intercept)31"] <-"(Intercept)" 
+confint_obs$Variable[confint_obs$Variable=="(Intercept)41"] <-"(Intercept)" 
+confint_obs$Variable[confint_obs$Variable=="(Intercept)51"] <-"(Intercept)" 
+confint_obs$Variable[confint_obs$Variable=="Elev"] <-"Elevation" 
+confint_obs$Variable[confint_obs$Variable=="Elev1"] <-"Elevation"
+confint_obs$Variable[confint_obs$Variable=="Elev2"] <-"Elevation" 
+confint_obs$Variable[confint_obs$Variable=="Elev3"] <-"Elevation" 
+confint_obs$Variable[confint_obs$Variable=="Elev4"] <-"Elevation" 
+confint_obs$Variable[confint_obs$Variable=="Elev5"] <-"Elevation" 
+confint_obs$Variable[confint_obs$Variable=="Elev6"] <-"Elevation" 
+confint_obs$Variable[confint_obs$Variable=="Elev11"] <-"Elevation" 
+confint_obs$Variable[confint_obs$Variable=="Elev21"] <-"Elevation" 
+confint_obs$Variable[confint_obs$Variable=="Elev31"] <-"Elevation" 
+confint_obs$Variable[confint_obs$Variable=="Elev41"] <-"Elevation" 
+confint_obs$Variable[confint_obs$Variable=="Elev51"] <-"Elevation" 
+confint_obs$Variable[confint_obs$Variable=="Prec"] <-"Precipitation" 
+confint_obs$Variable[confint_obs$Variable=="Prec1"] <-"Precipitation" 
+confint_obs$Variable[confint_obs$Variable=="Prec2"] <-"Precipitation" 
+confint_obs$Variable[confint_obs$Variable=="Prec3"] <-"Precipitation" 
+confint_obs$Variable[confint_obs$Variable=="Prec4"] <-"Precipitation" 
+confint_obs$Variable[confint_obs$Variable=="Prec6"] <-"Precipitation"
+confint_obs$Variable[confint_obs$Variable=="Prec5"] <-"Precipitation"
+confint_obs$Variable[confint_obs$Variable=="Prec11"] <-"Precipitation"
+confint_obs$Variable[confint_obs$Variable=="Prec21"] <-"Precipitation"
+confint_obs$Variable[confint_obs$Variable=="Prec31"] <-"Precipitation"
+confint_obs$Variable[confint_obs$Variable=="Prec41"] <-"Precipitation"
+confint_obs$Variable[confint_obs$Variable=="Prec51"] <-"Precipitation"
+confint_obs$Variable[confint_obs$Variable=="Latitude"] <-"Latitude"
+confint_obs$Variable[confint_obs$Variable=="Latitude1"] <-"Latitude"
+confint_obs$Variable[confint_obs$Variable=="Latitude2"] <-"Latitude"
+confint_obs$Variable[confint_obs$Variable=="Latitude3"] <-"Latitude"
+confint_obs$Variable[confint_obs$Variable=="Latitude4"] <-"Latitude"
+confint_obs$Variable[confint_obs$Variable=="Latitude5"] <-"Latitude"
+confint_obs$Variable[confint_obs$Variable=="Latitude6"] <-"Latitude"
+confint_obs$Variable[confint_obs$Variable=="Latitude11"] <-"Latitude"
+confint_obs$Variable[confint_obs$Variable=="Latitude21"] <-"Latitude"
+confint_obs$Variable[confint_obs$Variable=="Latitude31"] <-"Latitude"
+confint_obs$Variable[confint_obs$Variable=="Latitude41"] <-"Latitude"
+confint_obs$Variable[confint_obs$Variable=="Latitude51"] <-"Latitude"
+confint_obs$Variable[confint_obs$Variable=="VillDist"] <-"Village Dist."
+confint_obs$Variable[confint_obs$Variable=="VillDist1"] <-"Village Dist."
+confint_obs$Variable[confint_obs$Variable=="VillDist2"] <-"Village Dist."
+confint_obs$Variable[confint_obs$Variable=="VillDist3"] <-"Village Dist."
+confint_obs$Variable[confint_obs$Variable=="VillDist4"] <-"Village Dist."
+confint_obs$Variable[confint_obs$Variable=="VillDist6"] <-"Village Dist."
+confint_obs$Variable[confint_obs$Variable=="VillDist11"] <-"Village Dist."
+confint_obs$Variable[confint_obs$Variable=="VillDist21"] <-"Village Dist."
+confint_obs$Variable[confint_obs$Variable=="VillDist31"] <-"Village Dist."
+confint_obs$Variable[confint_obs$Variable=="VillDist41"] <-"Village Dist."
+confint_obs$Variable[confint_obs$Variable=="VillDist51"] <-"Village Dist."
+confint_obs$Variable[confint_obs$Variable=="SuccessionExploitee"] <-"Logged Forest"
+confint_obs$Variable[confint_obs$Variable=="SuccessionExploitee1"] <-"Logged Forest"
+confint_obs$Variable[confint_obs$Variable=="SuccessionExploitee2"] <-"Logged Forest"
+confint_obs$Variable[confint_obs$Variable=="SuccessionExploitee3"] <-"Logged Forest"
+confint_obs$Variable[confint_obs$Variable=="SuccessionExploitee4"] <-"Logged Forest"
+confint_obs$Variable[confint_obs$Variable=="SuccessionExploitee5"] <-"Logged Forest"
+confint_obs$Variable[confint_obs$Variable=="SuccessionExploitee6"] <-"Logged Forest"
+confint_obs$Variable[confint_obs$Variable=="SuccessionExploitee11"] <-"Logged Forest"
+confint_obs$Variable[confint_obs$Variable=="SuccessionExploitee21"] <-"Logged Forest"
+confint_obs$Variable[confint_obs$Variable=="SuccessionExploitee31"] <-"Logged Forest"
+confint_obs$Variable[confint_obs$Variable=="SuccessionExploitee41"] <-"Logged Forest"
+confint_obs$Variable[confint_obs$Variable=="SuccessionExploitee51"] <-"Logged Forest"
+confint_obs$Variable[confint_obs$Variable=="SuccessionSecondaire"] <-"Secondary Forest"
+confint_obs$Variable[confint_obs$Variable=="SuccessionSecondaire1"] <-"Secondary Forest"
+confint_obs$Variable[confint_obs$Variable=="SuccessionSecondaire2"] <-"Secondary Forest"
+confint_obs$Variable[confint_obs$Variable=="SuccessionSecondaire3"] <-"Secondary Forest"
+confint_obs$Variable[confint_obs$Variable=="SuccessionSecondaire4"] <-"Secondary Forest"
+confint_obs$Variable[confint_obs$Variable=="SuccessionSecondaire5"] <-"Secondary Forest"
+confint_obs$Variable[confint_obs$Variable=="SuccessionSecondaire6"] <-"Secondary Forest"
+confint_obs$Variable[confint_obs$Variable=="SuccessionSecondaire11"] <-"Secondary Forest"
+confint_obs$Variable[confint_obs$Variable=="SuccessionSecondaire21"] <-"Secondary Forest"
+confint_obs$Variable[confint_obs$Variable=="SuccessionSecondaire31"] <-"Secondary Forest"
+confint_obs$Variable[confint_obs$Variable=="SuccessionSecondaire41"] <-"Secondary Forest"
+confint_obs$Variable[confint_obs$Variable=="SuccessionSecondaire51"] <-"Secondary Forest"
+confint_obs$Variable[confint_obs$Variable=="SuccessionSecondaire exploite"] <-"Secondary Forest"
+confint_obs$Variable[confint_obs$Variable=="SuccessionSecondaire exploite1"] <-"Secondary Forest"
+confint_obs$Variable[confint_obs$Variable=="SuccessionSecondaire exploite2"] <-"Secondary Forest"
+confint_obs$Variable[confint_obs$Variable=="SuccessionSecondaire exploite3"] <-"Secondary Forest"
+confint_obs$Variable[confint_obs$Variable=="VillDist5"] <-"Village Dist."
+confint_obs$Variable[confint_obs$Variable=="(Intercept)5"] <-"(Intercept)"
+confint_obs$Model <- "Observed"
+
+confint_obs$VariableType <- confint_obs$Variable
+confint_obs$VariableType[confint_obs$Variable=="(Intercept)"] <-"Intercept" 
+confint_obs$VariableType[confint_obs$Variable=="Elevation"] <-"Natural" 
+confint_obs$VariableType[confint_obs$Variable=="Latitude"] <-"Natural"
+confint_obs$VariableType[confint_obs$Variable=="Village Dist."] <-"Anthropogenic"
+confint_obs$VariableType[confint_obs$Variable=="Logged Forest"] <-"Anthropogenic"
+confint_obs$VariableType[confint_obs$Variable=="Precipitation"] <-"Natural"
+confint_obs$VariableType[confint_obs$Variable=="Secondary Forest"] <-"Anthropogenic"
+```
+
+
+```{r}
+confint_both <- rbind(confint_all, confint_obs)
+colnames(confint_both)[8]<- "Variable Type"
+confint_both$`Variable Type`
+confint_both <- confint_both %>%filter(`Variable Type`!="Intercept")
+
+confint_both_new <- confint_both[confint_both$Network=="Imputed, Compensation"|confint_both$Network=="Observed, Compensation",]
+confint_both_new$Network[confint_both_new$Network=="Imputed, Compensation"] <- "Imputed"
+confint_both_new$Network[confint_both_new$Network=="Observed, Compensation"] <- "Observed"
+
+total_plot <- ggplot(data=confint_both_new[confint_both_new$Taxa=="Total",], aes(x= factor(Variable, levels=c("Village Dist.", "Secondary Forest", "Logged Forest", "Precipitation", "Elevation", "Latitude", "(Intercept)")), color=Network))+
+  geom_errorbar(position=position_dodge(.7), width=0.4, aes(ymin=Lower, ymax=Upper), size=0.75)+
+  geom_point(position=position_dodge(.7),aes(y=Estimate, color=Network, shape=`Variable Type`), size=3)+
+  scale_color_manual(name="Model Type", values=c("deepskyblue3", "gray50"))+
+  theme_classic()+
+  geom_hline(yintercept = 0)+
+  coord_flip()+
+  xlab("Variable")+ 
+  ylab("ABG Loss (kg/ha)")
+
+ele_plot <- ggplot(data=confint_both[confint_both$Taxa=="Elephant",], aes(x= factor(Variable, levels=c("Village Dist.", "Secondary Forest", "Logged Forest", "Precipitation", "Elevation", "Latitude", "(Intercept)")), color=Network))+
+  geom_errorbar(position=position_dodge(.7), width=0.25, aes(ymin=Lower, ymax=Upper), size=0.5)+
+  geom_point(position=position_dodge(.7),aes(y=Estimate, color=Network, shape=`Variable Type`), size=2)+
+  scale_color_manual(name="Model Type", values=c("deepskyblue3","lightskyblue",  "gray50",  "gray80"))+
+  theme_classic()+
+  geom_hline(yintercept = 0)+
+  coord_flip()+
+  xlab("Variable")+ 
+  ylab("ABG Loss (kg/ha)")
+
+ape_plot <- ggplot(data=confint_both[confint_both$Taxa=="Ape",], aes(x= factor(Variable, levels=c("Village Dist.", "Secondary Forest", "Logged Forest", "Precipitation", "Elevation", "Latitude", "(Intercept)")), color=Network))+
+  geom_errorbar(position=position_dodge(.7), width=0.25, aes(ymin=Lower, ymax=Upper), size=0.5)+
+  geom_point(position=position_dodge(.7),aes(y=Estimate, color=Network, shape=`Variable Type`), size=2)+
+  scale_color_manual(name="Model Type", values=c("deepskyblue3","lightskyblue",  "gray50",  "gray80"))+
+  theme_classic()+
+  geom_hline(yintercept = 0)+
+  coord_flip()+
+  xlab("Variable")+ 
+  ylab("ABG Loss (kg/ha)")
+
+monkey_plot <- ggplot(data=confint_both[confint_both$Taxa=="Monkey",], aes(x= factor(Variable, levels=c("Village Dist.", "Secondary Forest", "Logged Forest", "Precipitation", "Elevation", "Latitude", "(Intercept)")), color=Network))+
+  geom_errorbar(position=position_dodge(.7), width=0.25, aes(ymin=Lower, ymax=Upper), size=0.5)+
+  geom_point(position=position_dodge(.7),aes(y=Estimate, color=Network, shape=`Variable Type`), size=2)+
+  scale_color_manual(name="Model Type", values=c("deepskyblue3","lightskyblue",  "gray50",  "gray80"))+
+  theme_classic()+
+  geom_hline(yintercept = 0)+
+  coord_flip()+
+  xlab("Variable")+ 
+  ylab("ABG Loss (kg/ha)")
+
+ceph_plot <- ggplot(data=confint_both[confint_both$Taxa=="Duiker",], aes(x= factor(Variable, levels=c("Village Dist.", "Secondary Forest", "Logged Forest", "Precipitation", "Elevation", "Latitude", "(Intercept)")), color=Network))+
+  geom_errorbar(position=position_dodge(.7), width=0.25, aes(ymin=Lower, ymax=Upper), size=0.5)+
+  geom_point(position=position_dodge(.7),aes(y=Estimate, color=Network, shape=`Variable Type`), size=2)+
+  scale_color_manual(name="Model Type", values=c("deepskyblue3","lightskyblue",  "gray50",  "gray80"))+
+  theme_classic()+
+  geom_hline(yintercept = 0)+
+  coord_flip()+
+  xlab("Variable")+ 
+  ylab("ABG Loss (kg/ha)")
+
+smam_plot <- ggplot(data=confint_both[confint_both$Taxa=="Rodent",], aes(x= factor(Variable, levels=c("Village Dist.", "Secondary Forest", "Logged Forest", "Precipitation", "Elevation", "Latitude", "(Intercept)")), color=Network))+
+  geom_errorbar(position=position_dodge(.7), width=0.25, aes(ymin=Lower, ymax=Upper), size=0.5)+
+  geom_point(position=position_dodge(.7),aes(y=Estimate, color=Network, shape=`Variable Type`), size=2)+
+  scale_color_manual(name="Model Type", values=c("deepskyblue3","lightskyblue",  "gray50",  "gray80"))+
+  theme_classic()+
+  geom_hline(yintercept = 0)+
+  coord_flip()+
+  xlab("Variable")+ 
+  ylab("ABG Loss (kg/ha)")
+
+
+
+spatial_confint <- ggarrange(ele_plot, ape_plot, monkey_plot, ceph_plot, smam_plot, common.legend = TRUE, labels=c("a", "b", "c", "d", "e"), nrow=3, ncol=2,legend = NULL)
+
+confint_both2 <- confint_both
+confint_both2$Estimate <- round(confint_both2$Estimate, digits = 0)
+confint_both2$Lower <- round(confint_both2$Lower, digits = 0)
+confint_both2$Upper <- round(confint_both2$Upper, digits = 0)
+write.csv(confint_both2, "~/Documents/GitHub/FaunalDegradationAGB/Outputs/GeospatialSummary.csv")
+
+```
+
+
+

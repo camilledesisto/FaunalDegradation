@@ -1,0 +1,286 @@
+---
+title: "Dietary Redundancy"
+author: "Camille"
+date: "2/25/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r Load Packages}
+library(writexl)
+library(readr)
+library(vegan)
+library(ecodist)
+library(dplyr)
+library(tidyverse)
+library(ggpubr)
+library(network)
+library(spaa)
+library(bipartite)
+
+```
+
+```{r Workspace setup}
+wd_path <- "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/"
+getwd()
+data_path <- 'Data/'
+save_path <- 'Outputs/Expert/'
+source_path <- 'HelperScripts/'
+list_overlap <- list()
+list_width <- list()
+```
+
+```{r Niche Width/ Breadth: Imputed Network}
+
+#1) DATA PREPARATION
+#imputed network
+for(i in 1:100){
+  
+  source("/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/HelperScripts/SimDataManagement.R")
+
+trees.data2 <- tdat_frug2 %>%
+  select(Species, ele, smam, ape, monkey, ceph)%>%
+  group_by(Species)%>%
+  summarise(sum_ele=sum(ele),
+            sum_smam=sum(smam),
+            sum_ape=sum(ape),
+            sum_monkey=sum(monkey),
+            sum_ceph=sum(ceph),
+            )
+
+trees.data2$NDispersed <- rowSums(trees.data2[,-1])
+trees.data2 <- trees.data2[trees.data2$NDispersed!=0,]
+
+trees.data3 <- as.data.frame(t(trees.data2))
+colnames(trees.data3) <- trees.data3[1,]
+trees.data3 <- trees.data3[-1,]
+trees.data3 <- trees.data3[-6,]
+
+trees.data4 <- as.data.frame(sapply(trees.data3, as.numeric))
+rownames(trees.data4) <- rownames(trees.data3)
+rownames(trees.data4) <- c("Elephant", "Rodent", "Ape", "Monkey", "Duiker")
+trees.data4 <- trees.data4[c(1,3,4,5,2),]
+
+trees.data5 <- as.data.frame(t(trees.data4))
+niche_width <- niche.width(trees.data5 , method="levins")
+niche_width <- as.matrix(niche_width)
+niche_width <- as.data.frame(niche_width)
+
+list_width[[i]] <- niche_width
+
+niche_overlap_sch <-niche.overlap(trees.data5 , method="schoener")
+niche_overlap_sch <- as.matrix(niche_overlap_sch)
+niche_overlap_sch <- as.data.frame(niche_overlap_sch)
+niche_overlap_sch$Taxa2 <- rownames(niche_overlap_sch)
+niche_overlap_sch2 <- niche_overlap_sch %>%pivot_longer(cols=Elephant:Rodent)
+niche_overlap_sch2$value[niche_overlap_sch2$value==0] <- NA
+niche_overlap_sch3 <- niche_overlap_sch2
+niche_overlap_sch3$value[niche_overlap_sch3$Taxa2=="Rodent"] <- NA
+niche_overlap_sch3$value[niche_overlap_sch3$Taxa2=="Monkey"&niche_overlap_sch3$name!="Rodent"] <- NA
+niche_overlap_sch3$value[niche_overlap_sch3$Taxa2=="Elephant"&niche_overlap_sch3$name!="Rodent"&niche_overlap_sch3$name!="Monkey"] <- NA
+niche_overlap_sch3$value[niche_overlap_sch3$Taxa2=="Duiker"&niche_overlap_sch3$name=="Ape"] <- NA
+niche_overlap_sch4 <- niche_overlap_sch3%>% filter(!is.na(value), value!=0)
+
+ list_overlap[[i]] <- niche_overlap_sch4 
+}
+
+
+class(list_overlap)
+df_overlap <- bind_rows(list_overlap, .id = "column_label")
+df_width <- bind_rows(list_width, .id = "column_label")
+
+df_overlap2 <- df_overlap %>% group_by(Taxa2, name) %>% summarise(meanvalue=mean(value), sdvalue =sd(value))
+df_width_ele <- mean(df_width$Elephant)
+df_width_ape <- mean(df_width$Ape)
+df_width_monkey <- mean(df_width$Monkey)
+df_width_smam <- mean(df_width$Rodent)
+df_width_ceph <- mean(df_width$Duiker)
+
+df_overlap3 <- df_overlap2
+
+
+```
+
+```{r Niche Breadth/ Width: Observed Network}
+#Observed network
+tdat_frug2 <- read.csv("~/Documents/GitHub/FaunalDegradationAGB/Data/tdat_frug2_observed.csv")
+
+tdat_frug2 <- tdat_frug2 %>%
+  mutate(ele = select(., Loxodonta_cyclotis) %>% rowSums(na.rm = TRUE))
+tdat_frug2 <- tdat_frug2 %>%
+  mutate(ape = select(., Gorilla_gorilla, Pan_troglodytes ) %>% rowSums(na.rm = TRUE))
+tdat_frug2 <- tdat_frug2 %>%
+  mutate(ceph = select(.,  Cephalophus_callipygus:Cephalophus_silvicultor) %>% rowSums(na.rm = TRUE))
+tdat_frug2 <- tdat_frug2 %>%
+  mutate(smam = select(., Heliosciurus_rufobrachium) %>% rowSums(na.rm = TRUE))
+tdat_frug2 <- tdat_frug2 %>%
+  mutate(monkey = select(., Mandrillus_sphinx, Lophocebus_albigena,Cercopithecus_cephus:Colobus_satanas ) %>% rowSums(na.rm = TRUE))
+tdat_frug2$NDispersed_Taxa <- tdat_frug2$ele +tdat_frug2$ape +tdat_frug2$ceph +tdat_frug2$smam +tdat_frug2$monkey
+
+tdat_frug2$ele[tdat_frug2$ele>=1] <- 1
+tdat_frug2$ape[tdat_frug2$ape>=1] <- 1
+tdat_frug2$ceph[tdat_frug2$ceph>=1] <- 1
+tdat_frug2$smam[tdat_frug2$smam>=1] <- 1
+tdat_frug2$monkey[tdat_frug2$monkey>=1] <- 1
+
+trees.data_obs <- tdat_frug2
+
+trees.data2_obs <- trees.data_obs %>%
+  select(Species, ele, smam, ape, monkey, ceph)%>%
+  group_by(Species)%>%
+  summarise(sum_ele=sum(ele),
+            sum_smam=sum(smam),
+            sum_ape=sum(ape),
+            sum_monkey=sum(monkey),
+            sum_ceph=sum(ceph),
+            )
+
+trees.data2_obs$NDispersed <- rowSums(trees.data2_obs[,-1])
+trees.data2_obs <- trees.data2_obs[trees.data2_obs$NDispersed!=0,]
+
+trees.data3_obs <- as.data.frame(t(trees.data2_obs))
+colnames(trees.data3_obs) <- trees.data3_obs[1,]
+trees.data3_obs <- trees.data3_obs[-1,]
+trees.data3_obs <- trees.data3_obs[-6,]
+
+trees.data4_obs <- as.data.frame(sapply(trees.data3_obs, as.numeric))
+rownames(trees.data4_obs) <- rownames(trees.data3_obs)
+rownames(trees.data4_obs) <- c("Elephant", "Rodent", "Ape", "Monkey", "Duiker")
+trees.data4_obs <- trees.data4_obs[c(1,3,4,5,2),]
+
+
+trees.data5_obs <- as.data.frame(t(trees.data4_obs))
+niche_width_obs <- niche.width(trees.data5_obs , method="levins")
+niche_width_obs <- as.matrix(niche_width_obs)
+niche_width_obs <- as.data.frame(niche_width_obs)
+
+niche_overlap_sch_obs <-niche.overlap(trees.data5_obs , method="schoener")
+niche_overlap_sch_obs <- as.matrix(niche_overlap_sch_obs)
+niche_overlap_sch_obs <- as.data.frame(niche_overlap_sch_obs)
+niche_overlap_sch_obs$Taxa2 <- rownames(niche_overlap_sch_obs)
+niche_overlap_sch_obs2 <- niche_overlap_sch_obs %>%pivot_longer(cols=Elephant:Rodent)
+niche_overlap_sch_obs2$value[niche_overlap_sch_obs2$value==0] <- NA
+niche_overlap_sch_obs3 <- niche_overlap_sch_obs2
+niche_overlap_sch_obs3$value[niche_overlap_sch_obs3$Taxa2=="Rodent"] <- NA
+niche_overlap_sch_obs3$value[niche_overlap_sch_obs3$Taxa2=="Monkey"&niche_overlap_sch_obs3$name!="Rodent"] <- NA
+niche_overlap_sch_obs3$value[niche_overlap_sch_obs3$Taxa2=="Elephant"&niche_overlap_sch_obs3$name!="Rodent"&niche_overlap_sch_obs3$name!="Monkey"] <- NA
+niche_overlap_sch_obs3$value[niche_overlap_sch_obs3$Taxa2=="Duiker"&niche_overlap_sch_obs3$name=="Ape"] <- NA
+
+```
+
+```{r Niche Width and Overlap Plot}
+
+niche_overlap_plot <- ggplot(niche_overlap_sch4, aes(Taxa2, name, fill= value)) + 
+  geom_tile()+
+  scale_fill_gradient(low = "lightskyblue1", high = "deepskyblue4", na.value="white", name="Niche Overlap")+
+  ylab("Taxa")+
+  xlab("Taxa")+
+  theme_classic()
+
+niche_overlap_sch_obs4 <- niche_overlap_sch_obs3[niche_overlap_sch_obs3$name!="Ape",]
+
+niche_overlap_plot_obs <- ggplot(niche_overlap_sch_obs4, aes(Taxa2, name, fill= value)) + 
+  geom_tile()+
+  theme_classic()+
+  scale_fill_gradient(low = "grey80", high = "grey30", na.value="white", name="Niche Overlap")+
+  ylab("Taxa")+
+  xlab("Taxa")
+
+ggarrange( niche_overlap_plot_obs, niche_overlap_plot, labels=c("a", "b"))
+
+```
+
+```{r Modularity: Imputed Network}
+list_mod <- list()
+
+for(i in 1:100){
+  source("~/Documents/GitHub/FaunalDegradationAGB/HelperScripts/SimDataManagement.R")
+
+#Imputed Network
+tdat_frug2_disp <- tdat_frug2[tdat_frug2$NDispersed!=0,]
+tdat_frug2_disp <- tdat_frug2_disp[,c(37:52)]
+tdat_frug2_disp2 <- tdat_frug2_disp %>%
+  group_by(Species) %>%
+  summarise_all(sum)
+tdat_frug2_disp2 <- as.data.frame(tdat_frug2_disp2)
+rownames(tdat_frug2_disp2) <- tdat_frug2_disp2$Species
+tdat_frug2_disp2 <-  tdat_frug2_disp2[,-c(1)]
+
+tdat_frug2_disp3 <- tdat_frug2_disp2
+tdat_frug2_disp3$sum <- rowSums(tdat_frug2_disp3)
+
+taxa_network <- network::network(t(tdat_frug2_disp2), bipartite=T, matrix.type="bipartite")
+
+mod_taxa_network <- computeModules(tdat_frug2_disp2)
+mod_taxa_network_likelihood <- mod_taxa_network@likelihood # modularity 0.343
+czvalues_taxa_network <- czvalues(mod_taxa_network, weighted=FALSE, level="higher")
+czvalues_taxa_network <- as.data.frame(czvalues_taxa_network)
+
+list_mod[[i]] <- czvalues_taxa_network
+
+}
+
+df_mod <- bind_rows(list_mod, .id = "column_label")
+df_mod$name <- rep(colnames(tdat_frug2_disp2), times=100)
+df_mod2 <- df_mod %>% group_by(name) %>% summarise(mean_c = mean(c))
+df_mod3 <- df_mod %>%drop_na()%>% group_by(name) %>% summarise(mean_z = mean(z))
+df_mod4 <- left_join(df_mod2, df_mod3, by="name")
+df_mod4$Network <- "Imputed"
+
+```
+
+```{r Modularity: Observed Network}
+#Observed Network
+tdat_frug2_disp_obs <- trees.data_obs[trees.data_obs$NDispersed!=0,]
+tdat_frug2_disp_obs <- tdat_frug2_disp_obs[,c(37:52)]
+tdat_frug2_disp2_obs <- tdat_frug2_disp_obs %>%
+  group_by(Species) %>%
+  summarise_all(sum)
+tdat_frug2_disp2_obs <- as.data.frame(tdat_frug2_disp2_obs)
+rownames(tdat_frug2_disp2_obs) <- tdat_frug2_disp2_obs$Species
+tdat_frug2_disp2_obs <-  tdat_frug2_disp2_obs[,-1]
+
+tdat_frug2_disp3_obs <- tdat_frug2_disp2_obs
+tdat_frug2_disp3_obs$sum <- rowSums(tdat_frug2_disp3_obs)
+
+taxa_network_obs <- network::network(t(tdat_frug2_disp2_obs), bipartite=T, matrix.type="bipartite")
+
+mod_taxa_network_obs <- computeModules(tdat_frug2_disp2_obs)
+mod_taxa_network_likelihood_obs <- mod_taxa_network_obs@likelihood # modularity 0.337
+czvalues_taxa_network_obs <- czvalues(mod_taxa_network_obs, weighted=FALSE, level="higher")
+czvalues_taxa_network_obs <- as.data.frame(czvalues_taxa_network_obs)
+czvalues_taxa_network_obs$Network <- "Observed"
+czvalues_taxa_network_obs$name <- rownames(czvalues_taxa_network_obs)
+czvalues_taxa_network_obs <- czvalues_taxa_network_obs %>% select(name, c, z, Network) %>% rename(mean_c = c, mean_z=z)
+czvalues <- rbind(czvalues_taxa_network_obs, df_mod4)
+czvalues$mean_c <- round(czvalues$mean_c, 3)
+czvalues$mean_z <- round(czvalues$mean_z, 3)
+czvalues$name <-gsub("_", " ", czvalues$name, fixed=TRUE)
+
+write.csv(czvalues, "~/Documents/GitHub/FaunalDegradationAGB/Outputs/modularity.csv")
+
+```
+
+```{r Missing Interaction Identification}
+# Determine the number of new likely (>50% mean posterior) interactions
+
+imputed_data <- read.csv("~/Documents/GitHub/FaunalDegradationAGB/Data/tdat_frug2_imputed_expert.csv")
+imputed_data2 <- imputed_data %>% select(Cephalophus_callipygus:Philantomba_monticola) %>% pivot_longer(cols=Cephalophus_callipygus:Philantomba_monticola, names_to="Species", values_to="Interaction")
+imputed_data2$Interaction[imputed_data2$Interaction>0.5]<- 1
+imputed_data2$Interaction[imputed_data2$Interaction<0.5]<- 0
+sum(imputed_data2$Interaction)
+
+# Determine the number of new likely (>50% mean posterior) interactions
+
+observed_data <- read.csv("~/Documents/GitHub/FaunalDegradationAGB/Data/tdat_frug2.csv")
+observed_data2 <- observed_data %>% select(Cephalophus_callipygus:Philantomba_monticola) %>% pivot_longer(cols=Cephalophus_callipygus:Philantomba_monticola, names_to="Species", values_to="Interaction")
+sum(observed_data2$Interaction)
+
+sum(imputed_data2$Interaction)-sum(observed_data2$Interaction)
+sum(imputed_data2$Interaction)/sum(observed_data2$Interaction)
+
+```
+

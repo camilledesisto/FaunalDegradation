@@ -1,0 +1,185 @@
+---
+title: "StandVariables"
+author: "Camille"
+date: "5/25/2023"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r Set Directory}
+library(ggplot2);library(ggridges)
+getwd()
+data_path <- 'Data/'
+save_path <- 'Outputs/'
+source_path <- 'HelperScripts/'
+```
+
+```{r Imputed Interactions Stand Variables}
+list_stand <- list()
+
+for(i in 1:100){
+  
+source("/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/HelperScripts/SimDataManagement.R")
+tree_dat_imputed <- tdat_frug2 %>% select(meanWD, D, AGB, DispersedBinary, ele, ape, ceph, monkey, smam)
+tree_dat_imputed2 <- tree_dat_imputed %>% pivot_longer(cols = DispersedBinary:smam, names_to="Taxa", values_to="Interaction") %>% mutate(Model ="Imputed")
+tree_dat_imputed2$Interaction[tree_dat_imputed2$Interaction==1] <- "ImputedDispersed"
+tree_dat_imputed2$Interaction[tree_dat_imputed2$Interaction==0] <- "ImputedNotDispersed"
+
+tree.summary <- tree_dat_imputed2 %>%
+  group_by(Taxa, Interaction) %>%
+  summarise(
+    sdWD = sd(meanWD, na.rm = TRUE),
+    WD = mean(meanWD),
+    sdD = sd(D, na.rm = TRUE),
+    D = mean(D),
+    sdAGB = sd(AGB, na.rm = TRUE),
+    AGB = mean(AGB)
+  ) %>% select(Taxa, Interaction, WD, sdWD, D, sdD, AGB, sdAGB)
+
+
+ list_stand[[i]] <- tree.summary
+ 
+}
+
+df_stand <- bind_rows(list_stand, .id = "column_label")
+
+df_stand2 <-df_stand%>% group_by(Taxa, Interaction) %>% summarise(meanWD=mean(WD), sdWD =sd(WD),seWD=sdWD/sqrt(n()), 
+                                                                  WD_l = meanWD - seWD, WD_u = meanWD+seWD,
+                                                                  meanD=mean(D), sdD =sd(D),seD=sdD/sqrt(n()),
+                                                                   D_l = meanD - seD, D_u = meanD+seD,
+                                                                  meanAGB=mean(AGB), sdAGB =sd(AGB),seAGB=sdAGB/sqrt(n()),
+                                                                   AGB_l = meanAGB - seAGB, AGB_u = meanAGB+seAGB)
+
+```
+
+```{r Observed Interactions Stand Variables}
+
+source(file=paste0(source_path, "SimDataManagementObserved.R"))
+tree_dat_observed <- tdat_frug2 %>% select(meanWD, D, AGB, DispersedBinary, ele, ape, ceph, monkey, smam)
+
+
+tree_dat_observed2 <- tree_dat_observed %>% pivot_longer(cols = DispersedBinary:smam, names_to="Taxa", values_to="Interaction") %>% mutate(Model ="Observed") 
+tree_dat_observed2$Interaction[tree_dat_observed2$Interaction==1] <- "ObservedDispersed"
+tree_dat_observed2$Interaction[tree_dat_observed2$Interaction==0] <- "ObservedNotDispersed"
+
+
+df_stand_obs <-tree_dat_observed2%>% group_by(Taxa, Interaction) %>% summarise(sdWD =sd(meanWD),meanWD=mean(meanWD), seWD=sdWD/sqrt(n()), 
+                                                                  WD_l = meanWD - seWD, WD_u = meanWD+seWD,
+                                                                  meanD=mean(D), sdD =sd(D),seD=sdD/sqrt(n()),
+                                                                   D_l = meanD - seD, D_u = meanD+seD,
+                                                                  meanAGB=mean(AGB), sdAGB =sd(AGB),seAGB=sdAGB/sqrt(n()),
+                                                                   AGB_l = meanAGB - seAGB, AGB_u = meanAGB+seAGB)
+
+tree.summary <- rbind(df_stand2, df_stand_obs)
+
+tree.summary$Taxa[tree.summary$Taxa=="smam"] <- "Rodent"
+tree.summary$Taxa[tree.summary$Taxa=="ceph"] <- "Duiker"
+tree.summary$Taxa[tree.summary$Taxa=="ele"] <- "Elephant"
+tree.summary$Taxa[tree.summary$Taxa=="DispersedBinary"] <- "Total"
+tree.summary$Taxa[tree.summary$Taxa=="ape"] <- "Ape"
+tree.summary$Taxa[tree.summary$Taxa=="monkey"] <- "Monkey"
+
+tree.summary$Interaction[tree.summary$Interaction=="ImputedDispersed"] <- "Imputed, Dispersed"
+tree.summary$Interaction[tree.summary$Interaction=="ObservedDispersed"] <- "Observed, Dispersed"
+tree.summary$Interaction[tree.summary$Interaction=="ImputedNotDispersed"] <- "Imputed, Undispersed"
+tree.summary$Interaction[tree.summary$Interaction=="ObservedNotDispersed"] <- "Observed, Undispersed"
+
+```
+
+```{r Summarize and Visualize Results}
+
+tree.summary <- tree.summary %>% separate(
+  col = Interaction,
+  into = c("Network", "MammalDispersed")
+)
+
+tree.summary$MammalDispersed[tree.summary$MammalDispersed=="Dispersed"] <- "Yes"
+tree.summary$MammalDispersed[tree.summary$MammalDispersed=="Undispersed"] <- "No"
+
+tree.summary_total <- tree.summary[tree.summary$Taxa=="Total",]
+tree.summary_taxa <- tree.summary[tree.summary$Taxa!="Total",]
+
+WD_plot <- ggplot(data=tree.summary_taxa, aes(y= meanWD, x =Taxa, color=Network)) +
+  geom_point(aes(shape=MammalDispersed), size= 2.5,)+
+  scale_shape_manual(values=c(1, 19))+
+  geom_errorbar(aes(ymin = WD_l, ymax = WD_u), width = 0.2)+
+  theme_classic()+
+  coord_flip()+
+  scale_color_manual(name = "Network", values=c("deepskyblue3","gray50"))+
+  ylab("Wood Density (g/cm3)")+
+  guides(color = FALSE, shape=FALSE, size = FALSE)
+
+
+D_plot <- ggplot(data=tree.summary_taxa, aes(y= meanD, x =Taxa, color=Network)) +
+  geom_point(aes(shape=MammalDispersed), size= 2.5)+
+  scale_shape_manual(values=c(1, 19))+
+  geom_errorbar(aes(ymin = D_l, ymax = D_u), width = 0.2)+
+  theme_classic()+
+  coord_flip()+
+  scale_color_manual(name = "Network", values=c("deepskyblue3","gray50"))+
+  ylab("Diameter (cm)")+
+  guides(color = FALSE, shape=FALSE, size = FALSE)
+
+AGB_plot <- ggplot(data=tree.summary_taxa, aes(y= meanAGB, x =Taxa, color=Network)) +
+    geom_point(aes(shape=MammalDispersed), size= 2.5)+
+  scale_shape_manual(values=c(1, 19))+
+  geom_errorbar(aes(ymin = AGB_l, ymax = AGB_u), width = 0.2)+
+  theme_classic()+
+  coord_flip()+
+  scale_color_manual(name = "Network", values=c("deepskyblue3","gray50"))+
+  ylab("AGB (kg)")
+  
+
+stand_plot <- ggarrange(WD_plot, D_plot, labels=c("b", "c"), common.legend = T)
+stand_plot2 <- ggarrange(AGB_plot, stand_plot, labels = ("a"), nrow=2)
+
+tree.summary_total$TreeType <- paste(tree.summary_total$Network, tree.summary_total$MammalDispersed, sep="_")
+
+tree.summary_total$TreeType[tree.summary_total$TreeType=="Imputed_No"] <- "Imp., Not Disp."
+tree.summary_total$TreeType[tree.summary_total$TreeType=="Imputed_Yes"] <- "Imp., Disp."
+tree.summary_total$TreeType[tree.summary_total$TreeType=="Observed_No"] <- "Obs., Not Disp."
+tree.summary_total$TreeType[tree.summary_total$TreeType=="Observed_Yes"] <- "Obs., Disp."
+
+tree.summary_total$TreeType <- factor(tree.summary_total$TreeType, levels=c("Obs., Disp.", "Obs., Not Disp.", "Imp., Disp.", "Imp., Not Disp."))
+
+
+WD_plot_total <- ggplot(data=tree.summary_total, aes(y= meanWD, x=TreeType, color=Network)) +
+  geom_point(aes(shape=MammalDispersed), size= 2.5,)+
+  scale_shape_manual(values=c(1, 19))+
+  geom_errorbar(aes(ymin = WD_l, ymax = WD_u), width = 0.2)+
+  theme_classic()+
+  scale_color_manual(name = "Network", values=c("deepskyblue3","gray50"))+
+  ylab("Wood Density (g/cm3)")+
+  guides(color = FALSE, shape=FALSE, size = FALSE) + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+
+D_plot_total <- ggplot(data=tree.summary_total, aes(y= meanD, x=TreeType, color=Network)) +
+  geom_point(aes(shape=MammalDispersed), size= 2.5)+
+  scale_shape_manual(values=c(1, 19))+
+  geom_errorbar(aes(ymin = D_l, ymax = D_u), width = 0.2)+
+  theme_classic()+
+  scale_color_manual(name = "Network", values=c("deepskyblue3","gray50"))+
+  ylab("Diameter (cm)")+
+  guides(color = FALSE, shape=FALSE, size = FALSE)+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+
+AGB_plot_total <- ggplot(data=tree.summary_total, aes(y= meanAGB, x=TreeType, color=Network)) +
+    geom_point(aes(shape=MammalDispersed), size= 2.5)+
+  scale_shape_manual(values=c(1, 19))+
+  geom_errorbar(aes(ymin = AGB_l, ymax = AGB_u), width = 0.2)+
+  theme_classic()+
+  scale_color_manual(name = "Network", values=c("deepskyblue3","gray50"))+
+  ylab("AGB (kg)")+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+  
+
+stand_plot_total <- ggarrange(WD_plot_total, D_plot_total, labels=c("b", "c"), common.legend = T)
+stand_plot2_total <- ggarrange(AGB_plot_total, stand_plot_total, labels = ("a"), nrow=2)
+
+
+```
+
+

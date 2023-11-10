@@ -1,0 +1,249 @@
+---
+title: "ImputationDataComilation"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r Load packages}
+getwd()
+library(plyr)
+library(readr)
+library(tidyverse)
+```
+
+```{r Expert Scenario}
+#total, redundancy
+mydir = "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/Outputs/Expert/total/no_redundancy"
+myfiles = list.files(path=mydir, pattern="*.csv", full.names=TRUE)
+dat_csv = ldply(myfiles, read_csv)
+dat_csv$Simulation <- rep(1:100, each=78000)
+
+#total, no redundancy
+mydir_nr = "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/Outputs/Expert/total/no_redundancy"
+myfiles_nr = list.files(path=mydir_nr, pattern="*.csv", full.names=TRUE)
+dat_csv_nr = ldply(myfiles_nr, read_csv)
+dat_csv_nr$Simulation <- rep(1:100, each=78000)
+
+#ele, redundancy
+mydir_ele = "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/Outputs/Expert/ele/redundancy"
+myfiles_ele = list.files(path=mydir_ele, pattern="*.csv", full.names=TRUE)
+dat_csv_ele = ldply(myfiles_ele, read_csv)
+dat_csv_ele$Simulation <- rep(1:100, each=78000)
+
+#ele, no redundancy
+mydir_ele_nr = "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/Outputs/Expert/ele/no_redundancy"
+myfiles_ele_nr = list.files(path=mydir_ele_nr, pattern="*.csv", full.names=TRUE)
+dat_csv_ele_nr = ldply(myfiles_ele_nr, read_csv)
+dat_csv_ele_nr$Simulation <- rep(1:100, each=78000)
+
+#ape, redundancy
+mydir_ape = "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/Outputs/Expert/ape/redundancy"
+myfiles_ape = list.files(path=mydir_ape, pattern="*.csv", full.names=TRUE)
+dat_csv_ape = ldply(myfiles_ape, read_csv)
+dat_csv_ape$Simulation <- rep(1:100, each=78000)
+
+#ape, no redundancy
+mydir_ape_nr = "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/Outputs/Expert/ape/no_redundancy"
+myfiles_ape_nr = list.files(path=mydir_ape_nr, pattern="*.csv", full.names=TRUE)
+dat_csv_ape_nr = ldply(myfiles_ape_nr, read_csv)
+dat_csv_ape_nr$Simulation <- rep(1:100, each=78000)
+
+#monkey, redundancy
+mydir_monkey = "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/Outputs/Expert/monkey/redundancy"
+myfiles_monkey = list.files(path=mydir_monkey, pattern="*.csv", full.names=TRUE)
+dat_csv_monkey = ldply(myfiles_monkey, read_csv)
+dat_csv_monkey$Simulation <- rep(1:100, each=78000)
+
+#monkey, no redundancy
+mydir_monkey_nr = "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/Outputs/Expert/monkey/no_redundancy"
+myfiles_monkey_nr = list.files(path=mydir_monkey_nr, pattern="*.csv", full.names=TRUE)
+dat_csv_monkey_nr = ldply(myfiles_monkey_nr, read_csv)
+dat_csv_monkey_nr$Simulation <- rep(1:100, each=78000)
+
+#ceph, redundancy
+mydir_ceph = "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/Outputs/Expert/ceph/redundancy"
+myfiles_ceph = list.files(path=mydir_ceph, pattern="*.csv", full.names=TRUE)
+dat_csv_ceph = ldply(myfiles_ceph, read_csv)
+dat_csv_ceph$Simulation <- rep(1:100, each=78000)
+
+#ceph, no redundancy
+mydir_ceph_nr = "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/Outputs/Expert/ceph/no_redundancy"
+myfiles_ceph_nr = list.files(path=mydir_ceph_nr, pattern="*.csv", full.names=TRUE)
+dat_csv_ceph_nr = ldply(myfiles_ceph_nr, read_csv)
+dat_csv_ceph_nr$Simulation <- rep(1:100, each=78000)
+
+#smam, redundancy
+mydir_smam = "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/Outputs/Expert/smam/redundancy"
+myfiles_smam = list.files(path=mydir_smam, pattern="*.csv", full.names=TRUE)
+dat_csv_smam = ldply(myfiles_smam, read_csv)
+dat_csv_smam$Simulation <- rep(1:100, each=78000)
+
+#smam, no redundancy
+mydir_smam_nr = "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/Outputs/Expert/smam/no_redundancy"
+myfiles_smam_nr = list.files(path=mydir_smam_nr, pattern="*.csv", full.names=TRUE)
+dat_csv_smam_nr = ldply(myfiles_smam_nr, read_csv)
+dat_csv_smam_nr$Simulation <- rep(1:100, each=78000)
+
+dat_csv2 <- dat_csv %>% dplyr::group_by(Plot, Simulation, PercentRemoved) %>% dplyr::summarise(AGB_Change=mean(AGB_Change))
+
+dat_csv_nr2 <- dat_csv_nr %>% dplyr::group_by(Plot, Simulation, PercentRemoved) %>% dplyr::summarise(AGB_Change=mean(AGB_Change))
+
+dat_csv_ele2 <- dat_csv_ele %>% dplyr::group_by(Plot, Simulation, PercentRemoved) %>% dplyr::summarise(AGB_Change=mean(AGB_Change))
+
+dat_csv_ele_nr2 <- dat_csv_ele_nr %>% dplyr::group_by(Plot, Simulation, PercentRemoved) %>% dplyr::summarise(AGB_Change=mean(AGB_Change))
+
+dat_csv_ape2 <- dat_csv_ape %>% dplyr::group_by(Plot, Simulation, PercentRemoved) %>% dplyr::summarise(AGB_Change=mean(AGB_Change))
+
+dat_csv_ape_nr2 <- dat_csv_ape_nr %>% dplyr::group_by(Plot, Simulation, PercentRemoved) %>% dplyr::summarise(AGB_Change=mean(AGB_Change))
+
+dat_csv_monkey2 <- dat_csv_monkey %>% dplyr::group_by(Plot, Simulation, PercentRemoved) %>% dplyr::summarise(AGB_Change=mean(AGB_Change))
+
+dat_csv_monkey_nr2 <- dat_csv_monkey_nr %>% dplyr::group_by(Plot, Simulation, PercentRemoved) %>% dplyr::summarise(AGB_Change=mean(AGB_Change))
+
+dat_csv_ceph2 <- dat_csv_ceph %>% dplyr::group_by(Plot, Simulation, PercentRemoved) %>% dplyr::summarise(AGB_Change=mean(AGB_Change))
+
+dat_csv_ceph_nr2 <- dat_csv_ceph_nr %>% dplyr::group_by(Plot, Simulation, PercentRemoved) %>% dplyr::summarise(AGB_Change=mean(AGB_Change))
+
+dat_csv_smam2 <- dat_csv_smam %>% dplyr::group_by(Plot, Simulation, PercentRemoved) %>% dplyr::summarise(AGB_Change=mean(AGB_Change))
+
+dat_csv_smam_nr2 <- dat_csv_smam_nr %>% dplyr::group_by(Plot, Simulation, PercentRemoved) %>% dplyr::summarise(AGB_Change=mean(AGB_Change))
+
+write.csv(dat_csv2, "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed.csv")
+write.csv(dat_csv_nr2, "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed_nr.csv")
+
+write.csv(dat_csv_ele2, "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed_ele.csv")
+write.csv(dat_csv_ele_nr2, "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed_ele_nr.csv")
+
+write.csv(dat_csv_ape2, "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed_ape.csv")
+write.csv(dat_csv_ape_nr2, "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed_ape_nr.csv")
+
+write.csv(dat_csv_monkey2, "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed_monkey.csv")
+write.csv(dat_csv_monkey_nr2, "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed_monkey_nr.csv")
+
+write.csv(dat_csv_ceph2, "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed_ceph.csv")
+write.csv(dat_csv_ceph_nr2, "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed_ceph_nr.csv")
+
+write.csv(dat_csv_smam2, "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed_smam.csv")
+write.csv(dat_csv_smam_nr2, "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed_smam_nr.csv")
+
+```
+
+```{r 1/75 Scenario}
+#total, redundancy
+mydir = "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/Outputs/Imputed75/total/no_redundancy"
+myfiles = list.files(path=mydir, pattern="*.csv", full.names=TRUE)
+dat_csv = ldply(myfiles, read_csv)
+dat_csv$Simulation <- rep(1:100, each=78000)
+
+#total, no redundancy
+mydir_nr = "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/Outputs/Imputed75/total/no_redundancy"
+myfiles_nr = list.files(path=mydir_nr, pattern="*.csv", full.names=TRUE)
+dat_csv_nr = ldply(myfiles_nr, read_csv)
+dat_csv_nr$Simulation <- rep(1:100, each=78000)
+
+#ele, redundancy
+mydir_ele = "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/Outputs/Imputed75/ele/redundancy"
+myfiles_ele = list.files(path=mydir_ele, pattern="*.csv", full.names=TRUE)
+dat_csv_ele = ldply(myfiles_ele, read_csv)
+dat_csv_ele$Simulation <- rep(1:100, each=78000)
+
+#ele, no redundancy
+mydir_ele_nr = "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/Outputs/Imputed75/ele/no_redundancy"
+myfiles_ele_nr = list.files(path=mydir_ele_nr, pattern="*.csv", full.names=TRUE)
+dat_csv_ele_nr = ldply(myfiles_ele_nr, read_csv)
+dat_csv_ele_nr$Simulation <- rep(1:100, each=78000)
+
+#ape, redundancy
+mydir_ape = "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/Outputs/Imputed75/ape/redundancy"
+myfiles_ape = list.files(path=mydir_ape, pattern="*.csv", full.names=TRUE)
+dat_csv_ape = ldply(myfiles_ape, read_csv)
+dat_csv_ape$Simulation <- rep(1:100, each=78000)
+
+#ape, no redundancy
+mydir_ape_nr = "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/Outputs/Imputed75/ape/no_redundancy"
+myfiles_ape_nr = list.files(path=mydir_ape_nr, pattern="*.csv", full.names=TRUE)
+dat_csv_ape_nr = ldply(myfiles_ape_nr, read_csv)
+dat_csv_ape_nr$Simulation <- rep(1:100, each=78000)
+
+#monkey, redundancy
+mydir_monkey = "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/Outputs/Imputed75/monkey/redundancy"
+myfiles_monkey = list.files(path=mydir_monkey, pattern="*.csv", full.names=TRUE)
+dat_csv_monkey = ldply(myfiles_monkey, read_csv)
+dat_csv_monkey$Simulation <- rep(1:100, each=78000) 
+
+#monkey, no redundancy
+mydir_monkey_nr = "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/Outputs/Imputed75/monkey/no_redundancy"
+myfiles_monkey_nr = list.files(path=mydir_monkey_nr, pattern="*.csv", full.names=TRUE)
+dat_csv_monkey_nr = ldply(myfiles_monkey_nr, read_csv)
+dat_csv_monkey_nr$Simulation <- rep(1:100, each=78000)
+
+#ceph, redundancy
+mydir_ceph = "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/Outputs/Imputed75/ceph/redundancy"
+myfiles_ceph = list.files(path=mydir_ceph, pattern="*.csv", full.names=TRUE)
+dat_csv_ceph = ldply(myfiles_ceph, read_csv)
+dat_csv_ceph$Simulation <- rep(1:100, each=78000)
+
+#ceph, no redundancy
+mydir_ceph_nr = "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/Outputs/Imputed75/ceph/no_redundancy"
+myfiles_ceph_nr = list.files(path=mydir_ceph_nr, pattern="*.csv", full.names=TRUE)
+dat_csv_ceph_nr = ldply(myfiles_ceph_nr, read_csv)
+dat_csv_ceph_nr$Simulation <- rep(1:100, each=78000)
+
+#smam, redundancy
+mydir_smam = "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/Outputs/Imputed75/smam/redundancy"
+myfiles_smam = list.files(path=mydir_smam, pattern="*.csv", full.names=TRUE)
+dat_csv_smam = ldply(myfiles_smam, read_csv)
+dat_csv_smam$Simulation <- rep(1:100, each=78000)
+
+#smam, no redundancy
+mydir_smam_nr = "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/Outputs/Imputed75/smam/no_redundancy"
+myfiles_smam_nr = list.files(path=mydir_smam_nr, pattern="*.csv", full.names=TRUE)
+dat_csv_smam_nr = ldply(myfiles_smam_nr, read_csv)
+dat_csv_smam_nr$Simulation <- rep(1:100, each=78000)
+
+dat_csv2 <- dat_csv %>% dplyr::group_by(Plot, Simulation, PercentRemoved) %>% dplyr::summarise(AGB_Change=mean(AGB_Change))
+
+dat_csv_nr2 <- dat_csv_nr %>% dplyr::group_by(Plot, Simulation, PercentRemoved) %>% dplyr::summarise(AGB_Change=mean(AGB_Change))
+
+dat_csv_ele2 <- dat_csv_ele %>% dplyr::group_by(Plot, Simulation, PercentRemoved) %>% dplyr::summarise(AGB_Change=mean(AGB_Change))
+
+dat_csv_ele_nr2 <- dat_csv_ele_nr %>% dplyr::group_by(Plot, Simulation, PercentRemoved) %>% dplyr::summarise(AGB_Change=mean(AGB_Change))
+
+dat_csv_ape2 <- dat_csv_ape %>% dplyr::group_by(Plot, Simulation, PercentRemoved) %>% dplyr::summarise(AGB_Change=mean(AGB_Change))
+
+dat_csv_ape_nr2 <- dat_csv_ape_nr %>% dplyr::group_by(Plot, Simulation, PercentRemoved) %>% dplyr::summarise(AGB_Change=mean(AGB_Change))
+
+dat_csv_monkey2 <- dat_csv_monkey %>% dplyr::group_by(Plot, Simulation, PercentRemoved) %>% dplyr::summarise(AGB_Change=mean(AGB_Change))
+
+dat_csv_monkey_nr2 <- dat_csv_monkey_nr %>% dplyr::group_by(Plot, Simulation, PercentRemoved) %>% dplyr::summarise(AGB_Change=mean(AGB_Change))
+
+dat_csv_ceph2 <- dat_csv_ceph %>% dplyr::group_by(Plot, Simulation, PercentRemoved) %>% dplyr::summarise(AGB_Change=mean(AGB_Change))
+
+dat_csv_ceph_nr2 <- dat_csv_ceph_nr %>% dplyr::group_by(Plot, Simulation, PercentRemoved) %>% dplyr::summarise(AGB_Change=mean(AGB_Change))
+
+dat_csv_smam2 <- dat_csv_smam %>% dplyr::group_by(Plot, Simulation, PercentRemoved) %>% dplyr::summarise(AGB_Change=mean(AGB_Change))
+
+dat_csv_smam_nr2 <- dat_csv_smam_nr %>% dplyr::group_by(Plot, Simulation, PercentRemoved) %>% dplyr::summarise(AGB_Change=mean(AGB_Change))
+
+write.csv(dat_csv2, "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed75.csv")
+write.csv(dat_csv_nr2, "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed75_nr.csv")
+
+write.csv(dat_csv_ele2, "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed75_ele.csv")
+write.csv(dat_csv_ele_nr2, "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed75_ele_nr.csv")
+
+write.csv(dat_csv_ape2, "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed75_ape.csv")
+write.csv(dat_csv_ape_nr2, "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed75_ape_nr.csv")
+
+write.csv(dat_csv_monkey2, "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed75_monkey.csv")
+write.csv(dat_csv_monkey_nr2, "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed75_monkey_nr.csv")
+
+write.csv(dat_csv_ceph2, "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed75_ceph.csv")
+write.csv(dat_csv_ceph_nr2, "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed75_ceph_nr.csv")
+
+write.csv(dat_csv_smam2, "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed75_smam.csv")
+write.csv(dat_csv_smam_nr2, "/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed75_smam_nr.csv")
+
+```

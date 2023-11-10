@@ -1,0 +1,1335 @@
+---
+title: "DefaunationSimulationTests"
+author: "Camille"
+date: "5/9/2023"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(dplyr)
+
+#Observed Network
+Plot_simulation_nr <- read.csv("~/Documents/GitHub/FaunalDegradationAGB/Outputs/Observed/total/no_redundancy/output.csv")
+Plot_simulation <- read.csv("~/Documents/GitHub/FaunalDegradationAGB/Outputs/Observed/total/no_redundancy/output.csv")
+Plot_simulation_ele <- read.csv("~/Documents/GitHub/FaunalDegradationAGB/Outputs/Observed/ele/redundancy/output.csv")
+Plot_simulation_ele_nr <- read.csv("~/Documents/GitHub/FaunalDegradationAGB/Outputs/Observed/ele/no_redundancy/output.csv")
+Plot_simulation_ceph <- read.csv("~/Documents/GitHub/FaunalDegradationAGB/Outputs/Observed/ceph/redundancy/output.csv")
+Plot_simulation_ceph_nr <-read.csv("~/Documents/GitHub/FaunalDegradationAGB/Outputs/Observed/ceph/no_redundancy/output.csv")
+Plot_simulation_monkey <- read.csv("~/Documents/GitHub/FaunalDegradationAGB/Outputs/Observed/monkey/redundancy/output.csv")
+Plot_simulation_monkey_nr <- read.csv("~/Documents/GitHub/FaunalDegradationAGB/Outputs/Observed/monkey/no_redundancy/output.csv")
+Plot_simulation_smam <- read.csv("~/Documents/GitHub/FaunalDegradationAGB/Outputs/Observed/smam/redundancy/output.csv")
+Plot_simulation_smam_nr <- read.csv("~/Documents/GitHub/FaunalDegradationAGB/Outputs/Observed/smam/no_redundancy/output.csv")
+Plot_simulation_ape <-read.csv("~/Documents/GitHub/FaunalDegradationAGB/Outputs/Observed/ape/redundancy/output.csv")
+Plot_simulation_ape_nr <- read.csv("~/Documents/GitHub/FaunalDegradationAGB/Outputs/Observed/ape/no_redundancy/output.csv")
+
+#Imputed Network — expert scenario
+Plot_simulation_imputed <- read.csv("/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed_nr.csv")
+Plot_simulation_imputed_nr <- read.csv("/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed_nr.csv")
+
+Plot_simulation_imputed_ele <- read.csv("/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed_ele.csv")
+Plot_simulation_imputed_ele_nr <- read.csv("/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed_ele_nr.csv")
+
+Plot_simulation_imputed_ape <- read.csv("/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed_ape.csv")
+Plot_simulation_imputed_ape_nr <- read.csv("/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed_ape_nr.csv")
+
+Plot_simulation_imputed_monkey <- read.csv("/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed_monkey.csv")
+Plot_simulation_imputed_monkey_nr <- read.csv("/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed_monkey_nr.csv")
+
+Plot_simulation_imputed_ceph <- read.csv("/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed_ceph.csv")
+Plot_simulation_imputed_ceph_nr <- read.csv("/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed_ceph_nr.csv")
+
+Plot_simulation_imputed_smam <- read.csv("/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed_smam.csv")
+Plot_simulation_imputed_smam_nr <- read.csv("/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed_smam_nr.csv")
+
+
+#Imputed Network — 1/75 scenario
+Plot_simulation_imputed75 <- read.csv("/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed75_nr.csv")
+Plot_simulation_imputed75_nr <- read.csv("/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed75_nr.csv")
+
+Plot_simulation_imputed75_ele <- read.csv("/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed75_ele.csv")
+Plot_simulation_imputed75_ele_nr <- read.csv("/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed75_ele_nr.csv")
+
+Plot_simulation_imputed75_ape <- read.csv("/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed75_ape.csv")
+Plot_simulation_imputed75_ape_nr <- read.csv("/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed75_ape_nr.csv")
+
+Plot_simulation_imputed75_monkey <- read.csv("/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed75_monkey.csv")
+Plot_simulation_imputed75_monkey_nr <- read.csv("/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed75_monkey_nr.csv")
+
+Plot_simulation_imputed75_ceph <- read.csv("/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed75_ceph.csv")
+Plot_simulation_imputed75_ceph_nr <- read.csv("/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed75_ceph_nr.csv")
+
+Plot_simulation_imputed75_smam <- read.csv("/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed75_smam.csv")
+Plot_simulation_imputed75_smam_nr <- read.csv("/Users/camilledesisto/Documents/GitHub/FaunalDegradationAGB/SummaryOutputs/plot_simulations_imputed75_smam_nr.csv")
+
+
+
+```
+
+OBSERVED NETWORK
+
+```{r Total}
+
+#Redundancy
+
+Plot_simulation_output <- NULL
+
+for(i in 1:100){
+  Plot_simulation2 <- Plot_simulation %>% dplyr::select(-X) %>% group_by(Plot, PercentRemoved) %>% slice_sample(n=1)
+Plot_simulation3 <- Plot_simulation2 %>% group_by(PercentRemoved) %>% 
+  summarise(mAGB_Change = mean(AGB_Change, na.rm = TRUE),
+            sdAGB_Change = sd(AGB_Change, na.rm = TRUE),
+            nAGB_Change = n()) %>%
+  mutate(seAGB_Change = sdAGB_Change / sqrt(nAGB_Change),
+         lower.ciAGB_Change = mAGB_Change - qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change,
+         upper.ciAGB_Change = mAGB_Change + qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change)
+
+Plot_simulation_output <- rbind(Plot_simulation_output,Plot_simulation3)
+
+}
+
+Plot_simulation_output2 <- Plot_simulation_output %>% select(PercentRemoved, mAGB_Change)
+
+Plot_simulation25 <- t.test(Plot_simulation_output2[Plot_simulation_output2$PercentRemoved==25,])
+Plot_simulation50 <-t.test(Plot_simulation_output2[Plot_simulation_output2$PercentRemoved==50,])
+Plot_simulation100 <-t.test(Plot_simulation_output2[Plot_simulation_output2$PercentRemoved==100,])
+
+Plot_simulation_CI <- c(Plot_simulation25$estimate, Plot_simulation25$conf.int[1], Plot_simulation25$conf.int[2], 
+                        Plot_simulation50$estimate, Plot_simulation50$conf.int[1], Plot_simulation50$conf.int[2], 
+                        Plot_simulation100$estimate, Plot_simulation100$conf.int[1], Plot_simulation100$conf.int[2])
+
+
+#No Redundancy
+
+Plot_simulation_output_nr <- NULL
+
+for(i in 1:100){
+  Plot_simulation2_nr <- Plot_simulation_nr %>% dplyr::select(-X) %>% group_by(Plot, PercentRemoved) %>% slice_sample(n=1)
+Plot_simulation3_nr <- Plot_simulation2_nr %>% group_by(PercentRemoved) %>% 
+  summarise(mAGB_Change = mean(AGB_Change, na.rm = TRUE),
+            sdAGB_Change = sd(AGB_Change, na.rm = TRUE),
+            nAGB_Change = n()) %>%
+  mutate(seAGB_Change = sdAGB_Change / sqrt(nAGB_Change),
+         lower.ciAGB_Change = mAGB_Change - qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change,
+         upper.ciAGB_Change = mAGB_Change + qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change)
+
+Plot_simulation_output_nr <- rbind(Plot_simulation_output_nr,Plot_simulation3_nr)
+
+}
+
+Plot_simulation_output2_nr <- Plot_simulation_output_nr %>% select(PercentRemoved, mAGB_Change)
+
+Plot_simulation25_nr <- t.test(Plot_simulation_output2_nr[Plot_simulation_output2_nr$PercentRemoved==25,])
+Plot_simulation50_nr <-t.test(Plot_simulation_output2_nr[Plot_simulation_output2_nr$PercentRemoved==50,])
+Plot_simulation100_nr <-t.test(Plot_simulation_output2_nr[Plot_simulation_output2_nr$PercentRemoved==100,])
+
+Plot_simulation_CI_nr <- c(Plot_simulation25_nr$estimate, Plot_simulation25_nr$conf.int[1], Plot_simulation25_nr$conf.int[2], 
+                        Plot_simulation50_nr$estimate, Plot_simulation50_nr$conf.int[1], Plot_simulation50_nr$conf.int[2], 
+                        Plot_simulation100_nr$estimate, Plot_simulation100_nr$conf.int[1], Plot_simulation100_nr$conf.int[2])
+
+```
+
+```{r Elephant}
+
+#Redundancy
+
+Plot_simulation_output_ele <- NULL
+
+for(i in 1:100){
+  Plot_simulation_ele2 <- Plot_simulation_ele %>% dplyr::select(-X) %>% group_by(Plot, PercentRemoved) %>% slice_sample(n=1)
+Plot_simulation_ele3 <- Plot_simulation_ele2 %>% group_by(PercentRemoved) %>% 
+  summarise(mAGB_Change = mean(AGB_Change, na.rm = TRUE),
+            sdAGB_Change = sd(AGB_Change, na.rm = TRUE),
+            nAGB_Change = n()) %>%
+  mutate(seAGB_Change = sdAGB_Change / sqrt(nAGB_Change),
+         lower.ciAGB_Change = mAGB_Change - qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change,
+         upper.ciAGB_Change = mAGB_Change + qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change)
+
+Plot_simulation_output_ele <- rbind(Plot_simulation_output_ele,Plot_simulation_ele3)
+
+}
+
+Plot_simulation_output_ele2 <- Plot_simulation_output_ele %>% select(PercentRemoved, mAGB_Change)
+
+Plot_simulation_ele25 <- t.test(Plot_simulation_output_ele2[Plot_simulation_output_ele2$PercentRemoved==25,])
+Plot_simulation_ele50 <-t.test(Plot_simulation_output_ele2[Plot_simulation_output_ele2$PercentRemoved==50,])
+Plot_simulation_ele100 <-t.test(Plot_simulation_output_ele2[Plot_simulation_output_ele2$PercentRemoved==100,])
+
+Plot_simulation_ele_CI <- c(Plot_simulation_ele25$estimate, Plot_simulation_ele25$conf.int[1], Plot_simulation_ele25$conf.int[2], 
+                        Plot_simulation_ele50$estimate, Plot_simulation_ele50$conf.int[1], Plot_simulation_ele50$conf.int[2], 
+                        Plot_simulation_ele100$estimate, Plot_simulation_ele100$conf.int[1], Plot_simulation_ele100$conf.int[2])
+
+#No Redundancy
+
+Plot_simulation_output_ele_nr <- NULL
+
+for(i in 1:100){
+  Plot_simulation_ele_nr2 <- Plot_simulation_ele_nr %>% dplyr::select(-X) %>% group_by(Plot, PercentRemoved) %>% slice_sample(n=1)
+Plot_simulation_ele_nr3 <- Plot_simulation_ele_nr2 %>% group_by(PercentRemoved) %>% 
+  summarise(mAGB_Change = mean(AGB_Change, na.rm = TRUE),
+            sdAGB_Change = sd(AGB_Change, na.rm = TRUE),
+            nAGB_Change = n()) %>%
+  mutate(seAGB_Change = sdAGB_Change / sqrt(nAGB_Change),
+         lower.ciAGB_Change = mAGB_Change - qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change,
+         upper.ciAGB_Change = mAGB_Change + qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change)
+
+Plot_simulation_output_ele_nr <- rbind(Plot_simulation_output_ele_nr,Plot_simulation_ele_nr3)
+
+}
+
+Plot_simulation_output_ele_nr2 <- Plot_simulation_output_ele_nr %>% select(PercentRemoved, mAGB_Change)
+
+Plot_simulation_ele_nr25 <- t.test(Plot_simulation_output_ele_nr2[Plot_simulation_output_ele_nr2$PercentRemoved==25,])
+Plot_simulation_ele_nr50 <-t.test(Plot_simulation_output_ele_nr2[Plot_simulation_output_ele_nr2$PercentRemoved==50,])
+Plot_simulation_ele_nr100 <-t.test(Plot_simulation_output_ele_nr2[Plot_simulation_output_ele_nr2$PercentRemoved==100,])
+
+Plot_simulation_ele_nr_CI <- c(Plot_simulation_ele_nr25$estimate, Plot_simulation_ele_nr25$conf.int[1], Plot_simulation_ele_nr25$conf.int[2], 
+                        Plot_simulation_ele_nr50$estimate, Plot_simulation_ele_nr50$conf.int[1], Plot_simulation_ele_nr50$conf.int[2], 
+                        Plot_simulation_ele_nr100$estimate, Plot_simulation_ele_nr100$conf.int[1], Plot_simulation_ele_nr100$conf.int[2])
+
+```
+
+```{r ape}
+#Redundancy
+
+Plot_simulation_output_ape <- NULL
+
+for(i in 1:100){
+  Plot_simulation_ape2 <- Plot_simulation_ape %>% dplyr::select(-X) %>% group_by(Plot, PercentRemoved) %>% slice_sample(n=1)
+Plot_simulation_ape3 <- Plot_simulation_ape2 %>% group_by(PercentRemoved) %>% 
+  summarise(mAGB_Change = mean(AGB_Change, na.rm = TRUE),
+            sdAGB_Change = sd(AGB_Change, na.rm = TRUE),
+            nAGB_Change = n()) %>%
+  mutate(seAGB_Change = sdAGB_Change / sqrt(nAGB_Change),
+         lower.ciAGB_Change = mAGB_Change - qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change,
+         upper.ciAGB_Change = mAGB_Change + qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change)
+
+Plot_simulation_output_ape <- rbind(Plot_simulation_output_ape,Plot_simulation_ape3)
+
+}
+
+Plot_simulation_output_ape2 <- Plot_simulation_output_ape %>% select(PercentRemoved, mAGB_Change)
+
+Plot_simulation_ape25 <- t.test(Plot_simulation_output_ape2[Plot_simulation_output_ape2$PercentRemoved==25,])
+Plot_simulation_ape50 <-t.test(Plot_simulation_output_ape2[Plot_simulation_output_ape2$PercentRemoved==50,])
+Plot_simulation_ape100 <-t.test(Plot_simulation_output_ape2[Plot_simulation_output_ape2$PercentRemoved==100,])
+
+Plot_simulation_ape_CI <- c(Plot_simulation_ape25$estimate, Plot_simulation_ape25$conf.int[1], Plot_simulation_ape25$conf.int[2], 
+                        Plot_simulation_ape50$estimate, Plot_simulation_ape50$conf.int[1], Plot_simulation_ape50$conf.int[2], 
+                        Plot_simulation_ape100$estimate, Plot_simulation_ape100$conf.int[1], Plot_simulation_ape100$conf.int[2])
+
+#No Redundancy
+
+Plot_simulation_output_ape_nr <- NULL
+
+for(i in 1:100){
+  Plot_simulation_ape_nr2 <- Plot_simulation_ape_nr %>% dplyr::select(-X) %>% group_by(Plot, PercentRemoved) %>% slice_sample(n=1)
+Plot_simulation_ape_nr3 <- Plot_simulation_ape_nr2 %>% group_by(PercentRemoved) %>% 
+  summarise(mAGB_Change = mean(AGB_Change, na.rm = TRUE),
+            sdAGB_Change = sd(AGB_Change, na.rm = TRUE),
+            nAGB_Change = n()) %>%
+  mutate(seAGB_Change = sdAGB_Change / sqrt(nAGB_Change),
+         lower.ciAGB_Change = mAGB_Change - qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change,
+         upper.ciAGB_Change = mAGB_Change + qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change)
+
+Plot_simulation_output_ape_nr <- rbind(Plot_simulation_output_ape_nr,Plot_simulation_ape_nr3)
+
+}
+
+Plot_simulation_output_ape_nr2 <- Plot_simulation_output_ape_nr %>% select(PercentRemoved, mAGB_Change)
+
+Plot_simulation_ape_nr25 <- t.test(Plot_simulation_output_ape_nr2[Plot_simulation_output_ape_nr2$PercentRemoved==25,])
+Plot_simulation_ape_nr50 <-t.test(Plot_simulation_output_ape_nr2[Plot_simulation_output_ape_nr2$PercentRemoved==50,])
+Plot_simulation_ape_nr100 <-t.test(Plot_simulation_output_ape_nr2[Plot_simulation_output_ape_nr2$PercentRemoved==100,])
+
+Plot_simulation_ape_nr_CI <- c(Plot_simulation_ape_nr25$estimate, Plot_simulation_ape_nr25$conf.int[1], Plot_simulation_ape_nr25$conf.int[2], 
+                        Plot_simulation_ape_nr50$estimate, Plot_simulation_ape_nr50$conf.int[1], Plot_simulation_ape_nr50$conf.int[2], 
+                        Plot_simulation_ape_nr100$estimate, Plot_simulation_ape_nr100$conf.int[1], Plot_simulation_ape_nr100$conf.int[2])
+
+```
+
+```{r ceph}
+#Redundancy
+
+Plot_simulation_output_ceph <- NULL
+
+for(i in 1:100){
+  Plot_simulation_ceph2 <- Plot_simulation_ceph %>% select(-X) %>% group_by(Plot, PercentRemoved) %>% slice_sample(n=1)
+Plot_simulation_ceph3 <- Plot_simulation_ceph2 %>% group_by(PercentRemoved) %>% 
+  summarise(mAGB_Change = mean(AGB_Change, na.rm = TRUE),
+            sdAGB_Change = sd(AGB_Change, na.rm = TRUE),
+            nAGB_Change = n()) %>%
+  mutate(seAGB_Change = sdAGB_Change / sqrt(nAGB_Change),
+         lower.ciAGB_Change = mAGB_Change - qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change,
+         upper.ciAGB_Change = mAGB_Change + qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change)
+
+Plot_simulation_output_ceph <- rbind(Plot_simulation_output_ceph,Plot_simulation_ceph3)
+
+}
+
+Plot_simulation_output_ceph2 <- Plot_simulation_output_ceph %>% select(PercentRemoved, mAGB_Change)
+
+Plot_simulation_ceph25 <- t.test(Plot_simulation_output_ceph2[Plot_simulation_output_ceph2$PercentRemoved==25,])
+Plot_simulation_ceph50 <-t.test(Plot_simulation_output_ceph2[Plot_simulation_output_ceph2$PercentRemoved==50,])
+Plot_simulation_ceph100 <-t.test(Plot_simulation_output_ceph2[Plot_simulation_output_ceph2$PercentRemoved==100,])
+
+Plot_simulation_ceph_CI <- c(Plot_simulation_ceph25$estimate, Plot_simulation_ceph25$conf.int[1], Plot_simulation_ceph25$conf.int[2], 
+                        Plot_simulation_ceph50$estimate, Plot_simulation_ceph50$conf.int[1], Plot_simulation_ceph50$conf.int[2], 
+                        Plot_simulation_ceph100$estimate, Plot_simulation_ceph100$conf.int[1], Plot_simulation_ceph100$conf.int[2])
+
+#No Redundancy
+
+Plot_simulation_output_ceph_nr <- NULL
+
+for(i in 1:100){
+  Plot_simulation_ceph_nr2 <- Plot_simulation_ceph_nr %>% select(-X) %>% group_by(Plot, PercentRemoved) %>% slice_sample(n=1)
+Plot_simulation_ceph_nr3 <- Plot_simulation_ceph_nr2 %>% group_by(PercentRemoved) %>% 
+  summarise(mAGB_Change = mean(AGB_Change, na.rm = TRUE),
+            sdAGB_Change = sd(AGB_Change, na.rm = TRUE),
+            nAGB_Change = n()) %>%
+  mutate(seAGB_Change = sdAGB_Change / sqrt(nAGB_Change),
+         lower.ciAGB_Change = mAGB_Change - qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change,
+         upper.ciAGB_Change = mAGB_Change + qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change)
+
+Plot_simulation_output_ceph_nr <- rbind(Plot_simulation_output_ceph_nr,Plot_simulation_ceph_nr3)
+
+}
+
+Plot_simulation_output_ceph_nr2 <- Plot_simulation_output_ceph_nr %>% select(PercentRemoved, mAGB_Change)
+
+Plot_simulation_ceph_nr25 <- t.test(Plot_simulation_output_ceph_nr2[Plot_simulation_output_ceph_nr2$PercentRemoved==25,])
+Plot_simulation_ceph_nr50 <-t.test(Plot_simulation_output_ceph_nr2[Plot_simulation_output_ceph_nr2$PercentRemoved==50,])
+Plot_simulation_ceph_nr100 <-t.test(Plot_simulation_output_ceph_nr2[Plot_simulation_output_ceph_nr2$PercentRemoved==100,])
+
+Plot_simulation_ceph_nr_CI <- c(Plot_simulation_ceph_nr25$estimate, Plot_simulation_ceph_nr25$conf.int[1], Plot_simulation_ceph_nr25$conf.int[2], 
+                        Plot_simulation_ceph_nr50$estimate, Plot_simulation_ceph_nr50$conf.int[1], Plot_simulation_ceph_nr50$conf.int[2], 
+                        Plot_simulation_ceph_nr100$estimate, Plot_simulation_ceph_nr100$conf.int[1], Plot_simulation_ceph_nr100$conf.int[2])
+
+```
+
+```{r smam}
+#Redundancy
+
+Plot_simulation_output_smam <- NULL
+
+for(i in 1:100){
+  Plot_simulation_smam2 <- Plot_simulation_smam %>% dplyr::select(-X) %>% group_by(Plot, PercentRemoved) %>% slice_sample(n=1)
+Plot_simulation_smam3 <- Plot_simulation_smam2 %>% group_by(PercentRemoved) %>% 
+  summarise(mAGB_Change = mean(AGB_Change, na.rm = TRUE),
+            sdAGB_Change = sd(AGB_Change, na.rm = TRUE),
+            nAGB_Change = n()) %>%
+  mutate(seAGB_Change = sdAGB_Change / sqrt(nAGB_Change),
+         lower.ciAGB_Change = mAGB_Change - qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change,
+         upper.ciAGB_Change = mAGB_Change + qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change)
+
+Plot_simulation_output_smam <- rbind(Plot_simulation_output_smam,Plot_simulation_smam3)
+
+}
+
+Plot_simulation_output_smam2 <- Plot_simulation_output_smam %>% select(PercentRemoved, mAGB_Change)
+
+Plot_simulation_smam25 <- t.test(Plot_simulation_output_smam2[Plot_simulation_output_smam2$PercentRemoved==25,])
+Plot_simulation_smam50 <-t.test(Plot_simulation_output_smam2[Plot_simulation_output_smam2$PercentRemoved==50,])
+Plot_simulation_smam100 <-t.test(Plot_simulation_output_smam2[Plot_simulation_output_smam2$PercentRemoved==100,])
+
+Plot_simulation_smam_CI <- c(Plot_simulation_smam25$estimate, Plot_simulation_smam25$conf.int[1], Plot_simulation_smam25$conf.int[2], 
+                        Plot_simulation_smam50$estimate, Plot_simulation_smam50$conf.int[1], Plot_simulation_smam50$conf.int[2], 
+                        Plot_simulation_smam100$estimate, Plot_simulation_smam100$conf.int[1], Plot_simulation_smam100$conf.int[2])
+
+#No Redundancy
+
+Plot_simulation_output_smam_nr <- NULL
+
+for(i in 1:100){
+  Plot_simulation_smam_nr2 <- Plot_simulation_smam_nr %>% dplyr::select(-X) %>% group_by(Plot, PercentRemoved) %>% slice_sample(n=1)
+Plot_simulation_smam_nr3 <- Plot_simulation_smam_nr2 %>% group_by(PercentRemoved) %>% 
+  summarise(mAGB_Change = mean(AGB_Change, na.rm = TRUE),
+            sdAGB_Change = sd(AGB_Change, na.rm = TRUE),
+            nAGB_Change = n()) %>%
+  mutate(seAGB_Change = sdAGB_Change / sqrt(nAGB_Change),
+         lower.ciAGB_Change = mAGB_Change - qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change,
+         upper.ciAGB_Change = mAGB_Change + qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change)
+
+Plot_simulation_output_smam_nr <- rbind(Plot_simulation_output_smam_nr,Plot_simulation_smam_nr3)
+
+}
+
+Plot_simulation_output_smam_nr2 <- Plot_simulation_output_smam_nr %>% select(PercentRemoved, mAGB_Change)
+
+Plot_simulation_smam_nr25 <- t.test(Plot_simulation_output_smam_nr2[Plot_simulation_output_smam_nr2$PercentRemoved==25,])
+Plot_simulation_smam_nr50 <-t.test(Plot_simulation_output_smam_nr2[Plot_simulation_output_smam_nr2$PercentRemoved==50,])
+Plot_simulation_smam_nr100 <-t.test(Plot_simulation_output_smam_nr2[Plot_simulation_output_smam_nr2$PercentRemoved==100,])
+
+Plot_simulation_smam_nr_CI <- c(Plot_simulation_smam_nr25$estimate, Plot_simulation_smam_nr25$conf.int[1], Plot_simulation_smam_nr25$conf.int[2], 
+                        Plot_simulation_smam_nr50$estimate, Plot_simulation_smam_nr50$conf.int[1], Plot_simulation_smam_nr50$conf.int[2], 
+                        Plot_simulation_smam_nr100$estimate, Plot_simulation_smam_nr100$conf.int[1], Plot_simulation_smam_nr100$conf.int[2])
+
+```
+
+```{r Monkey}
+#Redundancy
+
+Plot_simulation_output_monkey <- NULL
+
+for(i in 1:100){
+  Plot_simulation_monkey2 <- Plot_simulation_monkey %>% select(-X) %>% group_by(Plot, PercentRemoved) %>% slice_sample(n=1)
+Plot_simulation_monkey3 <- Plot_simulation_monkey2 %>% group_by(PercentRemoved) %>% 
+  summarise(mAGB_Change = mean(AGB_Change, na.rm = TRUE),
+            sdAGB_Change = sd(AGB_Change, na.rm = TRUE),
+            nAGB_Change = n()) %>%
+  mutate(seAGB_Change = sdAGB_Change / sqrt(nAGB_Change),
+         lower.ciAGB_Change = mAGB_Change - qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change,
+         upper.ciAGB_Change = mAGB_Change + qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change)
+
+Plot_simulation_output_monkey <- rbind(Plot_simulation_output_monkey,Plot_simulation_monkey3)
+
+}
+
+Plot_simulation_output_monkey2 <- Plot_simulation_output_monkey %>% select(PercentRemoved, mAGB_Change)
+
+Plot_simulation_monkey25 <- t.test(Plot_simulation_output_monkey2[Plot_simulation_output_monkey2$PercentRemoved==25,])
+Plot_simulation_monkey50 <-t.test(Plot_simulation_output_monkey2[Plot_simulation_output_monkey2$PercentRemoved==50,])
+Plot_simulation_monkey100 <-t.test(Plot_simulation_output_monkey2[Plot_simulation_output_monkey2$PercentRemoved==100,])
+
+Plot_simulation_monkey_CI <- c(Plot_simulation_monkey25$estimate, Plot_simulation_monkey25$conf.int[1], Plot_simulation_monkey25$conf.int[2], 
+                        Plot_simulation_monkey50$estimate, Plot_simulation_monkey50$conf.int[1], Plot_simulation_monkey50$conf.int[2], 
+                        Plot_simulation_monkey100$estimate, Plot_simulation_monkey100$conf.int[1], Plot_simulation_monkey100$conf.int[2])
+
+#No Redundancy
+
+Plot_simulation_output_monkey_nr <- NULL
+
+for(i in 1:100){
+  Plot_simulation_monkey_nr2 <- Plot_simulation_monkey_nr %>% select(-X) %>% group_by(Plot, PercentRemoved) %>% slice_sample(n=1)
+Plot_simulation_monkey_nr3 <- Plot_simulation_monkey_nr2 %>% group_by(PercentRemoved) %>% 
+  summarise(mAGB_Change = mean(AGB_Change, na.rm = TRUE),
+            sdAGB_Change = sd(AGB_Change, na.rm = TRUE),
+            nAGB_Change = n()) %>%
+  mutate(seAGB_Change = sdAGB_Change / sqrt(nAGB_Change),
+         lower.ciAGB_Change = mAGB_Change - qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change,
+         upper.ciAGB_Change = mAGB_Change + qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change)
+
+Plot_simulation_output_monkey_nr <- rbind(Plot_simulation_output_monkey_nr,Plot_simulation_monkey_nr3)
+
+}
+
+Plot_simulation_output_monkey_nr2 <- Plot_simulation_output_monkey_nr %>% select(PercentRemoved, mAGB_Change)
+
+Plot_simulation_monkey_nr25 <- t.test(Plot_simulation_output_monkey_nr2[Plot_simulation_output_monkey_nr2$PercentRemoved==25,])
+Plot_simulation_monkey_nr50 <-t.test(Plot_simulation_output_monkey_nr2[Plot_simulation_output_monkey_nr2$PercentRemoved==50,])
+Plot_simulation_monkey_nr100 <-t.test(Plot_simulation_output_monkey_nr2[Plot_simulation_output_monkey_nr2$PercentRemoved==100,])
+
+Plot_simulation_monkey_nr_CI <- c(Plot_simulation_monkey_nr25$estimate, Plot_simulation_monkey_nr25$conf.int[1], Plot_simulation_monkey_nr25$conf.int[2], 
+                        Plot_simulation_monkey_nr50$estimate, Plot_simulation_monkey_nr50$conf.int[1], Plot_simulation_monkey_nr50$conf.int[2], 
+                        Plot_simulation_monkey_nr100$estimate, Plot_simulation_monkey_nr100$conf.int[1], Plot_simulation_monkey_nr100$conf.int[2])
+
+```
+
+IMPUTED NETWORK -- EXPERT SCENARIO
+
+```{r Total}
+
+#Redundancy
+
+Plot_simulation_imputed_output <- NULL
+
+for(i in 1:100){
+  Plot_simulation_imputed2 <- Plot_simulation_imputed %>% select(-X) %>% group_by(Plot, PercentRemoved) %>% slice_sample(n=1)
+Plot_simulation_imputed3 <- Plot_simulation_imputed2 %>% group_by(PercentRemoved) %>% 
+  summarise(mAGB_Change = mean(AGB_Change, na.rm = TRUE),
+            sdAGB_Change = sd(AGB_Change, na.rm = TRUE),
+            nAGB_Change = n()) %>%
+  mutate(seAGB_Change = sdAGB_Change / sqrt(nAGB_Change),
+         lower.ciAGB_Change = mAGB_Change - qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change,
+         upper.ciAGB_Change = mAGB_Change + qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change)
+
+Plot_simulation_imputed_output <- rbind(Plot_simulation_imputed_output,Plot_simulation_imputed3)
+
+}
+
+Plot_simulation_imputed_output2 <- Plot_simulation_imputed_output %>% select(PercentRemoved, mAGB_Change)
+
+Plot_simulation_imputed25 <- t.test(Plot_simulation_imputed_output2[Plot_simulation_imputed_output2$PercentRemoved==25,])
+Plot_simulation_imputed50 <-t.test(Plot_simulation_imputed_output2[Plot_simulation_imputed_output2$PercentRemoved==50,])
+Plot_simulation_imputed100 <-t.test(Plot_simulation_imputed_output2[Plot_simulation_imputed_output2$PercentRemoved==100,])
+
+Plot_simulation_imputed_CI <- c(Plot_simulation_imputed25$estimate, Plot_simulation_imputed25$conf.int[1], Plot_simulation_imputed25$conf.int[2], 
+                        Plot_simulation_imputed50$estimate, Plot_simulation_imputed50$conf.int[1], Plot_simulation_imputed50$conf.int[2], 
+                        Plot_simulation_imputed100$estimate, Plot_simulation_imputed100$conf.int[1], Plot_simulation_imputed100$conf.int[2])
+
+
+#No Redundancy
+
+Plot_simulation_imputed_output_nr <- NULL
+
+for(i in 1:100){
+  Plot_simulation_imputed2_nr <- Plot_simulation_imputed_nr %>% select(-X) %>% group_by(Plot, PercentRemoved) %>% slice_sample(n=1)
+Plot_simulation_imputed3_nr <- Plot_simulation_imputed2_nr %>% group_by(PercentRemoved) %>% 
+  summarise(mAGB_Change = mean(AGB_Change, na.rm = TRUE),
+            sdAGB_Change = sd(AGB_Change, na.rm = TRUE),
+            nAGB_Change = n()) %>%
+  mutate(seAGB_Change = sdAGB_Change / sqrt(nAGB_Change),
+         lower.ciAGB_Change = mAGB_Change - qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change,
+         upper.ciAGB_Change = mAGB_Change + qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change)
+
+Plot_simulation_imputed_output_nr <- rbind(Plot_simulation_imputed_output_nr,Plot_simulation_imputed3_nr)
+
+}
+
+Plot_simulation_imputed_output2_nr <- Plot_simulation_imputed_output_nr %>% select(PercentRemoved, mAGB_Change)
+
+Plot_simulation_imputed25_nr <- t.test(Plot_simulation_imputed_output2_nr[Plot_simulation_imputed_output2_nr$PercentRemoved==25,])
+Plot_simulation_imputed50_nr <-t.test(Plot_simulation_imputed_output2_nr[Plot_simulation_imputed_output2_nr$PercentRemoved==50,])
+Plot_simulation_imputed100_nr <-t.test(Plot_simulation_imputed_output2_nr[Plot_simulation_imputed_output2_nr$PercentRemoved==100,])
+
+Plot_simulation_imputed_CI_nr <- c(Plot_simulation_imputed25_nr$estimate, Plot_simulation_imputed25_nr$conf.int[1], Plot_simulation_imputed25_nr$conf.int[2], 
+                        Plot_simulation_imputed50_nr$estimate, Plot_simulation_imputed50_nr$conf.int[1], Plot_simulation_imputed50_nr$conf.int[2], 
+                        Plot_simulation_imputed100_nr$estimate, Plot_simulation_imputed100_nr$conf.int[1], Plot_simulation_imputed100_nr$conf.int[2])
+
+```
+
+```{r Elephant}
+
+#Redundancy
+
+Plot_simulation_imputed_output_ele <- NULL
+
+for(i in 1:100){
+  Plot_simulation_imputed_ele2 <- Plot_simulation_imputed_ele %>% select(-X) %>% group_by(Plot, PercentRemoved) %>% slice_sample(n=1)
+Plot_simulation_imputed_ele3 <- Plot_simulation_imputed_ele2 %>% group_by(PercentRemoved) %>% 
+  summarise(mAGB_Change = mean(AGB_Change, na.rm = TRUE),
+            sdAGB_Change = sd(AGB_Change, na.rm = TRUE),
+            nAGB_Change = n()) %>%
+  mutate(seAGB_Change = sdAGB_Change / sqrt(nAGB_Change),
+         lower.ciAGB_Change = mAGB_Change - qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change,
+         upper.ciAGB_Change = mAGB_Change + qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change)
+
+Plot_simulation_imputed_output_ele <- rbind(Plot_simulation_imputed_output_ele,Plot_simulation_imputed_ele3)
+
+}
+
+Plot_simulation_imputed_output_ele2 <- Plot_simulation_imputed_output_ele %>% select(PercentRemoved, mAGB_Change)
+
+Plot_simulation_imputed_ele25 <- t.test(Plot_simulation_imputed_output_ele2[Plot_simulation_imputed_output_ele2$PercentRemoved==25,])
+Plot_simulation_imputed_ele50 <-t.test(Plot_simulation_imputed_output_ele2[Plot_simulation_imputed_output_ele2$PercentRemoved==50,])
+Plot_simulation_imputed_ele100 <-t.test(Plot_simulation_imputed_output_ele2[Plot_simulation_imputed_output_ele2$PercentRemoved==100,])
+
+Plot_simulation_imputed_ele_CI <- c(Plot_simulation_imputed_ele25$estimate, Plot_simulation_imputed_ele25$conf.int[1], Plot_simulation_imputed_ele25$conf.int[2], 
+                        Plot_simulation_imputed_ele50$estimate, Plot_simulation_imputed_ele50$conf.int[1], Plot_simulation_imputed_ele50$conf.int[2], 
+                        Plot_simulation_imputed_ele100$estimate, Plot_simulation_imputed_ele100$conf.int[1], Plot_simulation_imputed_ele100$conf.int[2])
+
+#No Redundancy
+
+Plot_simulation_imputed_output_ele_nr <- NULL
+
+for(i in 1:100){
+  Plot_simulation_imputed_ele_nr2 <- Plot_simulation_imputed_ele_nr %>% select(-X) %>% group_by(Plot, PercentRemoved) %>% slice_sample(n=1)
+Plot_simulation_imputed_ele_nr3 <- Plot_simulation_imputed_ele_nr2 %>% group_by(PercentRemoved) %>% 
+  summarise(mAGB_Change = mean(AGB_Change, na.rm = TRUE),
+            sdAGB_Change = sd(AGB_Change, na.rm = TRUE),
+            nAGB_Change = n()) %>%
+  mutate(seAGB_Change = sdAGB_Change / sqrt(nAGB_Change),
+         lower.ciAGB_Change = mAGB_Change - qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change,
+         upper.ciAGB_Change = mAGB_Change + qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change)
+
+Plot_simulation_imputed_output_ele_nr <- rbind(Plot_simulation_imputed_output_ele_nr,Plot_simulation_imputed_ele_nr3)
+
+}
+
+Plot_simulation_imputed_output_ele_nr2 <- Plot_simulation_imputed_output_ele_nr %>% select(PercentRemoved, mAGB_Change)
+
+Plot_simulation_imputed_ele_nr25 <- t.test(Plot_simulation_imputed_output_ele_nr2[Plot_simulation_imputed_output_ele_nr2$PercentRemoved==25,])
+Plot_simulation_imputed_ele_nr50 <-t.test(Plot_simulation_imputed_output_ele_nr2[Plot_simulation_imputed_output_ele_nr2$PercentRemoved==50,])
+Plot_simulation_imputed_ele_nr100 <-t.test(Plot_simulation_imputed_output_ele_nr2[Plot_simulation_imputed_output_ele_nr2$PercentRemoved==100,])
+
+Plot_simulation_imputed_ele_nr_CI <- c(Plot_simulation_imputed_ele_nr25$estimate, Plot_simulation_imputed_ele_nr25$conf.int[1], Plot_simulation_imputed_ele_nr25$conf.int[2], 
+                        Plot_simulation_imputed_ele_nr50$estimate, Plot_simulation_imputed_ele_nr50$conf.int[1], Plot_simulation_imputed_ele_nr50$conf.int[2], 
+                        Plot_simulation_imputed_ele_nr100$estimate, Plot_simulation_imputed_ele_nr100$conf.int[1], Plot_simulation_imputed_ele_nr100$conf.int[2])
+
+```
+
+```{r ape}
+#Redundancy
+
+Plot_simulation_imputed_output_ape <- NULL
+
+for(i in 1:100){
+  Plot_simulation_imputed_ape2 <- Plot_simulation_imputed_ape %>% dplyr::select(-X) %>% group_by(Plot, PercentRemoved) %>% slice_sample(n=1)
+Plot_simulation_imputed_ape3 <- Plot_simulation_imputed_ape2 %>% group_by(PercentRemoved) %>% 
+  summarise(mAGB_Change = mean(AGB_Change, na.rm = TRUE),
+            sdAGB_Change = sd(AGB_Change, na.rm = TRUE),
+            nAGB_Change = n()) %>%
+  mutate(seAGB_Change = sdAGB_Change / sqrt(nAGB_Change),
+         lower.ciAGB_Change = mAGB_Change - qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change,
+         upper.ciAGB_Change = mAGB_Change + qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change)
+
+Plot_simulation_imputed_output_ape <- rbind(Plot_simulation_imputed_output_ape,Plot_simulation_imputed_ape3)
+
+}
+
+Plot_simulation_imputed_output_ape2 <- Plot_simulation_imputed_output_ape %>% select(PercentRemoved, mAGB_Change)
+
+Plot_simulation_imputed_ape25 <- t.test(Plot_simulation_imputed_output_ape2[Plot_simulation_imputed_output_ape2$PercentRemoved==25,])
+Plot_simulation_imputed_ape50 <-t.test(Plot_simulation_imputed_output_ape2[Plot_simulation_imputed_output_ape2$PercentRemoved==50,])
+Plot_simulation_imputed_ape100 <-t.test(Plot_simulation_imputed_output_ape2[Plot_simulation_imputed_output_ape2$PercentRemoved==100,])
+
+Plot_simulation_imputed_ape_CI <- c(Plot_simulation_imputed_ape25$estimate, Plot_simulation_imputed_ape25$conf.int[1], Plot_simulation_imputed_ape25$conf.int[2], 
+                        Plot_simulation_imputed_ape50$estimate, Plot_simulation_imputed_ape50$conf.int[1], Plot_simulation_imputed_ape50$conf.int[2], 
+                        Plot_simulation_imputed_ape100$estimate, Plot_simulation_imputed_ape100$conf.int[1], Plot_simulation_imputed_ape100$conf.int[2])
+
+#No Redundancy
+
+Plot_simulation_imputed_output_ape_nr <- NULL
+
+for(i in 1:100){
+  Plot_simulation_imputed_ape_nr2 <- Plot_simulation_imputed_ape_nr %>% dplyr::select(-X) %>% group_by(Plot, PercentRemoved) %>% slice_sample(n=1)
+Plot_simulation_imputed_ape_nr3 <- Plot_simulation_imputed_ape_nr2 %>% group_by(PercentRemoved) %>% 
+  summarise(mAGB_Change = mean(AGB_Change, na.rm = TRUE),
+            sdAGB_Change = sd(AGB_Change, na.rm = TRUE),
+            nAGB_Change = n()) %>%
+  mutate(seAGB_Change = sdAGB_Change / sqrt(nAGB_Change),
+         lower.ciAGB_Change = mAGB_Change - qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change,
+         upper.ciAGB_Change = mAGB_Change + qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change)
+
+Plot_simulation_imputed_output_ape_nr <- rbind(Plot_simulation_imputed_output_ape_nr,Plot_simulation_imputed_ape_nr3)
+
+}
+
+Plot_simulation_imputed_output_ape_nr2 <- Plot_simulation_imputed_output_ape_nr %>% select(PercentRemoved, mAGB_Change)
+
+Plot_simulation_imputed_ape_nr25 <- t.test(Plot_simulation_imputed_output_ape_nr2[Plot_simulation_imputed_output_ape_nr2$PercentRemoved==25,])
+Plot_simulation_imputed_ape_nr50 <-t.test(Plot_simulation_imputed_output_ape_nr2[Plot_simulation_imputed_output_ape_nr2$PercentRemoved==50,])
+Plot_simulation_imputed_ape_nr100 <-t.test(Plot_simulation_imputed_output_ape_nr2[Plot_simulation_imputed_output_ape_nr2$PercentRemoved==100,])
+
+Plot_simulation_imputed_ape_nr_CI <- c(Plot_simulation_imputed_ape_nr25$estimate, Plot_simulation_imputed_ape_nr25$conf.int[1], Plot_simulation_imputed_ape_nr25$conf.int[2], 
+                        Plot_simulation_imputed_ape_nr50$estimate, Plot_simulation_imputed_ape_nr50$conf.int[1], Plot_simulation_imputed_ape_nr50$conf.int[2], 
+                        Plot_simulation_imputed_ape_nr100$estimate, Plot_simulation_imputed_ape_nr100$conf.int[1], Plot_simulation_imputed_ape_nr100$conf.int[2])
+
+```
+
+```{r Monkey}
+#Redundancy
+
+Plot_simulation_imputed_output_monkey <- NULL
+
+for(i in 1:100){
+  Plot_simulation_imputed_monkey2 <- Plot_simulation_imputed_monkey %>% dplyr::select(-X) %>% group_by(Plot, PercentRemoved) %>% slice_sample(n=1)
+Plot_simulation_imputed_monkey3 <- Plot_simulation_imputed_monkey2 %>% group_by(PercentRemoved) %>% 
+  summarise(mAGB_Change = mean(AGB_Change, na.rm = TRUE),
+            sdAGB_Change = sd(AGB_Change, na.rm = TRUE),
+            nAGB_Change = n()) %>%
+  mutate(seAGB_Change = sdAGB_Change / sqrt(nAGB_Change),
+         lower.ciAGB_Change = mAGB_Change - qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change,
+         upper.ciAGB_Change = mAGB_Change + qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change)
+
+Plot_simulation_imputed_output_monkey <- rbind(Plot_simulation_imputed_output_monkey,Plot_simulation_imputed_monkey3)
+
+}
+
+Plot_simulation_imputed_output_monkey2 <- Plot_simulation_imputed_output_monkey %>% select(PercentRemoved, mAGB_Change)
+
+Plot_simulation_imputed_monkey25 <- t.test(Plot_simulation_imputed_output_monkey2[Plot_simulation_imputed_output_monkey2$PercentRemoved==25,])
+Plot_simulation_imputed_monkey50 <-t.test(Plot_simulation_imputed_output_monkey2[Plot_simulation_imputed_output_monkey2$PercentRemoved==50,])
+Plot_simulation_imputed_monkey100 <-t.test(Plot_simulation_imputed_output_monkey2[Plot_simulation_imputed_output_monkey2$PercentRemoved==100,])
+
+Plot_simulation_imputed_monkey_CI <- c(Plot_simulation_imputed_monkey25$estimate, Plot_simulation_imputed_monkey25$conf.int[1], Plot_simulation_imputed_monkey25$conf.int[2], 
+                        Plot_simulation_imputed_monkey50$estimate, Plot_simulation_imputed_monkey50$conf.int[1], Plot_simulation_imputed_monkey50$conf.int[2], 
+                        Plot_simulation_imputed_monkey100$estimate, Plot_simulation_imputed_monkey100$conf.int[1], Plot_simulation_imputed_monkey100$conf.int[2])
+
+#No Redundancy
+
+Plot_simulation_imputed_output_monkey_nr <- NULL
+
+for(i in 1:100){
+  Plot_simulation_imputed_monkey_nr2 <- Plot_simulation_imputed_monkey_nr %>% dplyr::select(-X) %>% group_by(Plot, PercentRemoved) %>% slice_sample(n=1)
+Plot_simulation_imputed_monkey_nr3 <- Plot_simulation_imputed_monkey_nr2 %>% group_by(PercentRemoved) %>% 
+  summarise(mAGB_Change = mean(AGB_Change, na.rm = TRUE),
+            sdAGB_Change = sd(AGB_Change, na.rm = TRUE),
+            nAGB_Change = n()) %>%
+  mutate(seAGB_Change = sdAGB_Change / sqrt(nAGB_Change),
+         lower.ciAGB_Change = mAGB_Change - qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change,
+         upper.ciAGB_Change = mAGB_Change + qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change)
+
+Plot_simulation_imputed_output_monkey_nr <- rbind(Plot_simulation_imputed_output_monkey_nr,Plot_simulation_imputed_monkey_nr3)
+
+}
+
+Plot_simulation_imputed_output_monkey_nr2 <- Plot_simulation_imputed_output_monkey_nr %>% select(PercentRemoved, mAGB_Change)
+
+Plot_simulation_imputed_monkey_nr25 <- t.test(Plot_simulation_imputed_output_monkey_nr2[Plot_simulation_imputed_output_monkey_nr2$PercentRemoved==25,])
+Plot_simulation_imputed_monkey_nr50 <-t.test(Plot_simulation_imputed_output_monkey_nr2[Plot_simulation_imputed_output_monkey_nr2$PercentRemoved==50,])
+Plot_simulation_imputed_monkey_nr100 <-t.test(Plot_simulation_imputed_output_monkey_nr2[Plot_simulation_imputed_output_monkey_nr2$PercentRemoved==100,])
+
+Plot_simulation_imputed_monkey_nr_CI <- c(Plot_simulation_imputed_monkey_nr25$estimate, Plot_simulation_imputed_monkey_nr25$conf.int[1], Plot_simulation_imputed_monkey_nr25$conf.int[2], 
+                        Plot_simulation_imputed_monkey_nr50$estimate, Plot_simulation_imputed_monkey_nr50$conf.int[1], Plot_simulation_imputed_monkey_nr50$conf.int[2], 
+                        Plot_simulation_imputed_monkey_nr100$estimate, Plot_simulation_imputed_monkey_nr100$conf.int[1], Plot_simulation_imputed_monkey_nr100$conf.int[2])
+
+```
+
+```{r smam}
+#Redundancy
+
+Plot_simulation_imputed_output_smam <- NULL
+
+for(i in 1:100){
+  Plot_simulation_imputed_smam2 <- Plot_simulation_imputed_smam %>% dplyr::select(-X) %>% group_by(Plot, PercentRemoved) %>% slice_sample(n=1)
+Plot_simulation_imputed_smam3 <- Plot_simulation_imputed_smam2 %>% group_by(PercentRemoved) %>% 
+  summarise(mAGB_Change = mean(AGB_Change, na.rm = TRUE),
+            sdAGB_Change = sd(AGB_Change, na.rm = TRUE),
+            nAGB_Change = n()) %>%
+  mutate(seAGB_Change = sdAGB_Change / sqrt(nAGB_Change),
+         lower.ciAGB_Change = mAGB_Change - qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change,
+         upper.ciAGB_Change = mAGB_Change + qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change)
+
+Plot_simulation_imputed_output_smam <- rbind(Plot_simulation_imputed_output_smam,Plot_simulation_imputed_smam3)
+
+}
+
+Plot_simulation_imputed_output_smam2 <- Plot_simulation_imputed_output_smam %>% select(PercentRemoved, mAGB_Change)
+
+Plot_simulation_imputed_smam25 <- t.test(Plot_simulation_imputed_output_smam2[Plot_simulation_imputed_output_smam2$PercentRemoved==25,])
+Plot_simulation_imputed_smam50 <-t.test(Plot_simulation_imputed_output_smam2[Plot_simulation_imputed_output_smam2$PercentRemoved==50,])
+Plot_simulation_imputed_smam100 <-t.test(Plot_simulation_imputed_output_smam2[Plot_simulation_imputed_output_smam2$PercentRemoved==100,])
+
+Plot_simulation_imputed_smam_CI <- c(Plot_simulation_imputed_smam25$estimate, Plot_simulation_imputed_smam25$conf.int[1], Plot_simulation_imputed_smam25$conf.int[2], 
+                        Plot_simulation_imputed_smam50$estimate, Plot_simulation_imputed_smam50$conf.int[1], Plot_simulation_imputed_smam50$conf.int[2], 
+                        Plot_simulation_imputed_smam100$estimate, Plot_simulation_imputed_smam100$conf.int[1], Plot_simulation_imputed_smam100$conf.int[2])
+
+#No Redundancy
+
+Plot_simulation_imputed_output_smam_nr <- NULL
+
+for(i in 1:100){
+  Plot_simulation_imputed_smam_nr2 <- Plot_simulation_imputed_smam_nr %>% dplyr::select(-X) %>% group_by(Plot, PercentRemoved) %>% slice_sample(n=1)
+Plot_simulation_imputed_smam_nr3 <- Plot_simulation_imputed_smam_nr2 %>% group_by(PercentRemoved) %>% 
+  summarise(mAGB_Change = mean(AGB_Change, na.rm = TRUE),
+            sdAGB_Change = sd(AGB_Change, na.rm = TRUE),
+            nAGB_Change = n()) %>%
+  mutate(seAGB_Change = sdAGB_Change / sqrt(nAGB_Change),
+         lower.ciAGB_Change = mAGB_Change - qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change,
+         upper.ciAGB_Change = mAGB_Change + qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change)
+
+Plot_simulation_imputed_output_smam_nr <- rbind(Plot_simulation_imputed_output_smam_nr,Plot_simulation_imputed_smam_nr3)
+
+}
+
+Plot_simulation_imputed_output_smam_nr2 <- Plot_simulation_imputed_output_smam_nr %>% select(PercentRemoved, mAGB_Change)
+
+Plot_simulation_imputed_smam_nr25 <- t.test(Plot_simulation_imputed_output_smam_nr2[Plot_simulation_imputed_output_smam_nr2$PercentRemoved==25,])
+Plot_simulation_imputed_smam_nr50 <-t.test(Plot_simulation_imputed_output_smam_nr2[Plot_simulation_imputed_output_smam_nr2$PercentRemoved==50,])
+Plot_simulation_imputed_smam_nr100 <-t.test(Plot_simulation_imputed_output_smam_nr2[Plot_simulation_imputed_output_smam_nr2$PercentRemoved==100,])
+
+Plot_simulation_imputed_smam_nr_CI <- c(Plot_simulation_imputed_smam_nr25$estimate, Plot_simulation_imputed_smam_nr25$conf.int[1], Plot_simulation_imputed_smam_nr25$conf.int[2], 
+                        Plot_simulation_imputed_smam_nr50$estimate, Plot_simulation_imputed_smam_nr50$conf.int[1], Plot_simulation_imputed_smam_nr50$conf.int[2], 
+                        Plot_simulation_imputed_smam_nr100$estimate, Plot_simulation_imputed_smam_nr100$conf.int[1], Plot_simulation_imputed_smam_nr100$conf.int[2])
+
+```
+
+```{r ceph}
+#Redundancy
+
+Plot_simulation_imputed_output_ceph <- NULL
+
+for(i in 1:100){
+  Plot_simulation_imputed_ceph2 <- Plot_simulation_imputed_ceph %>% dplyr::select(-X) %>% group_by(Plot, PercentRemoved) %>% slice_sample(n=1)
+Plot_simulation_imputed_ceph3 <- Plot_simulation_imputed_ceph2 %>% group_by(PercentRemoved) %>% 
+  summarise(mAGB_Change = mean(AGB_Change, na.rm = TRUE),
+            sdAGB_Change = sd(AGB_Change, na.rm = TRUE),
+            nAGB_Change = n()) %>%
+  mutate(seAGB_Change = sdAGB_Change / sqrt(nAGB_Change),
+         lower.ciAGB_Change = mAGB_Change - qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change,
+         upper.ciAGB_Change = mAGB_Change + qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change)
+
+Plot_simulation_imputed_output_ceph <- rbind(Plot_simulation_imputed_output_ceph,Plot_simulation_imputed_ceph3)
+
+}
+
+Plot_simulation_imputed_output_ceph2 <- Plot_simulation_imputed_output_ceph %>% select(PercentRemoved, mAGB_Change)
+
+Plot_simulation_imputed_ceph25 <- t.test(Plot_simulation_imputed_output_ceph2[Plot_simulation_imputed_output_ceph2$PercentRemoved==25,])
+Plot_simulation_imputed_ceph50 <-t.test(Plot_simulation_imputed_output_ceph2[Plot_simulation_imputed_output_ceph2$PercentRemoved==50,])
+Plot_simulation_imputed_ceph100 <-t.test(Plot_simulation_imputed_output_ceph2[Plot_simulation_imputed_output_ceph2$PercentRemoved==100,])
+
+Plot_simulation_imputed_ceph_CI <- c(Plot_simulation_imputed_ceph25$estimate, Plot_simulation_imputed_ceph25$conf.int[1], Plot_simulation_imputed_ceph25$conf.int[2], 
+                        Plot_simulation_imputed_ceph50$estimate, Plot_simulation_imputed_ceph50$conf.int[1], Plot_simulation_imputed_ceph50$conf.int[2], 
+                        Plot_simulation_imputed_ceph100$estimate, Plot_simulation_imputed_ceph100$conf.int[1], Plot_simulation_imputed_ceph100$conf.int[2])
+
+#No Redundancy
+
+Plot_simulation_imputed_output_ceph_nr <- NULL
+
+for(i in 1:100){
+  Plot_simulation_imputed_ceph_nr2 <- Plot_simulation_imputed_ceph_nr %>% dplyr::select(-X) %>% group_by(Plot, PercentRemoved) %>% slice_sample(n=1)
+Plot_simulation_imputed_ceph_nr3 <- Plot_simulation_imputed_ceph_nr2 %>% group_by(PercentRemoved) %>% 
+  summarise(mAGB_Change = mean(AGB_Change, na.rm = TRUE),
+            sdAGB_Change = sd(AGB_Change, na.rm = TRUE),
+            nAGB_Change = n()) %>%
+  mutate(seAGB_Change = sdAGB_Change / sqrt(nAGB_Change),
+         lower.ciAGB_Change = mAGB_Change - qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change,
+         upper.ciAGB_Change = mAGB_Change + qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change)
+
+Plot_simulation_imputed_output_ceph_nr <- rbind(Plot_simulation_imputed_output_ceph_nr,Plot_simulation_imputed_ceph_nr3)
+
+}
+
+Plot_simulation_imputed_output_ceph_nr2 <- Plot_simulation_imputed_output_ceph_nr %>% select(PercentRemoved, mAGB_Change)
+
+Plot_simulation_imputed_ceph_nr25 <- t.test(Plot_simulation_imputed_output_ceph_nr2[Plot_simulation_imputed_output_ceph_nr2$PercentRemoved==25,])
+Plot_simulation_imputed_ceph_nr50 <-t.test(Plot_simulation_imputed_output_ceph_nr2[Plot_simulation_imputed_output_ceph_nr2$PercentRemoved==50,])
+Plot_simulation_imputed_ceph_nr100 <-t.test(Plot_simulation_imputed_output_ceph_nr2[Plot_simulation_imputed_output_ceph_nr2$PercentRemoved==100,])
+
+Plot_simulation_imputed_ceph_nr_CI <- c(Plot_simulation_imputed_ceph_nr25$estimate, Plot_simulation_imputed_ceph_nr25$conf.int[1], Plot_simulation_imputed_ceph_nr25$conf.int[2], 
+                        Plot_simulation_imputed_ceph_nr50$estimate, Plot_simulation_imputed_ceph_nr50$conf.int[1], Plot_simulation_imputed_ceph_nr50$conf.int[2], 
+                        Plot_simulation_imputed_ceph_nr100$estimate, Plot_simulation_imputed_ceph_nr100$conf.int[1], Plot_simulation_imputed_ceph_nr100$conf.int[2])
+
+```
+
+
+IMPUTED NETWORK -- 1/75 SCENARIO
+
+```{r Total}
+
+#Redundancy
+
+Plot_simulation_imputed75_output <- NULL
+
+for(i in 1:100){
+  Plot_simulation_imputed752 <- Plot_simulation_imputed75 %>% select(-X) %>% group_by(Plot, PercentRemoved) %>% slice_sample(n=1)
+Plot_simulation_imputed753 <- Plot_simulation_imputed752 %>% group_by(PercentRemoved) %>% 
+  summarise(mAGB_Change = mean(AGB_Change, na.rm = TRUE),
+            sdAGB_Change = sd(AGB_Change, na.rm = TRUE),
+            nAGB_Change = n()) %>%
+  mutate(seAGB_Change = sdAGB_Change / sqrt(nAGB_Change),
+         lower.ciAGB_Change = mAGB_Change - qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change,
+         upper.ciAGB_Change = mAGB_Change + qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change)
+
+Plot_simulation_imputed75_output <- rbind(Plot_simulation_imputed75_output,Plot_simulation_imputed753)
+
+}
+
+Plot_simulation_imputed75_output2 <- Plot_simulation_imputed75_output %>% select(PercentRemoved, mAGB_Change)
+
+Plot_simulation_imputed7525 <- t.test(Plot_simulation_imputed75_output2[Plot_simulation_imputed75_output2$PercentRemoved==25,])
+Plot_simulation_imputed7550 <-t.test(Plot_simulation_imputed75_output2[Plot_simulation_imputed75_output2$PercentRemoved==50,])
+Plot_simulation_imputed75100 <-t.test(Plot_simulation_imputed75_output2[Plot_simulation_imputed75_output2$PercentRemoved==100,])
+
+Plot_simulation_imputed75_CI <- c(Plot_simulation_imputed7525$estimate, Plot_simulation_imputed7525$conf.int[1], Plot_simulation_imputed7525$conf.int[2], 
+                        Plot_simulation_imputed7550$estimate, Plot_simulation_imputed7550$conf.int[1], Plot_simulation_imputed7550$conf.int[2], 
+                        Plot_simulation_imputed75100$estimate, Plot_simulation_imputed75100$conf.int[1], Plot_simulation_imputed75100$conf.int[2])
+
+
+#No Redundancy
+
+Plot_simulation_imputed75_output_nr <- NULL
+
+for(i in 1:100){
+  Plot_simulation_imputed752_nr <- Plot_simulation_imputed75_nr %>% select(-X) %>% group_by(Plot, PercentRemoved) %>% slice_sample(n=1)
+Plot_simulation_imputed753_nr <- Plot_simulation_imputed752_nr %>% group_by(PercentRemoved) %>% 
+  summarise(mAGB_Change = mean(AGB_Change, na.rm = TRUE),
+            sdAGB_Change = sd(AGB_Change, na.rm = TRUE),
+            nAGB_Change = n()) %>%
+  mutate(seAGB_Change = sdAGB_Change / sqrt(nAGB_Change),
+         lower.ciAGB_Change = mAGB_Change - qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change,
+         upper.ciAGB_Change = mAGB_Change + qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change)
+
+Plot_simulation_imputed75_output_nr <- rbind(Plot_simulation_imputed75_output_nr,Plot_simulation_imputed753_nr)
+
+}
+
+Plot_simulation_imputed75_output2_nr <- Plot_simulation_imputed75_output_nr %>% select(PercentRemoved, mAGB_Change)
+
+Plot_simulation_imputed7525_nr <- t.test(Plot_simulation_imputed75_output2_nr[Plot_simulation_imputed75_output2_nr$PercentRemoved==25,])
+Plot_simulation_imputed7550_nr <-t.test(Plot_simulation_imputed75_output2_nr[Plot_simulation_imputed75_output2_nr$PercentRemoved==50,])
+Plot_simulation_imputed75100_nr <-t.test(Plot_simulation_imputed75_output2_nr[Plot_simulation_imputed75_output2_nr$PercentRemoved==100,])
+
+Plot_simulation_imputed75_CI_nr <- c(Plot_simulation_imputed7525_nr$estimate, Plot_simulation_imputed7525_nr$conf.int[1], Plot_simulation_imputed7525_nr$conf.int[2], 
+                        Plot_simulation_imputed7550_nr$estimate, Plot_simulation_imputed7550_nr$conf.int[1], Plot_simulation_imputed7550_nr$conf.int[2], 
+                        Plot_simulation_imputed75100_nr$estimate, Plot_simulation_imputed75100_nr$conf.int[1], Plot_simulation_imputed75100_nr$conf.int[2])
+
+```
+
+```{r Elephant}
+
+#Redundancy
+
+Plot_simulation_imputed75_output_ele <- NULL
+
+for(i in 1:100){
+  Plot_simulation_imputed75_ele2 <- Plot_simulation_imputed75_ele %>% select(-X) %>% group_by(Plot, PercentRemoved) %>% slice_sample(n=1)
+Plot_simulation_imputed75_ele3 <- Plot_simulation_imputed75_ele2 %>% group_by(PercentRemoved) %>% 
+  summarise(mAGB_Change = mean(AGB_Change, na.rm = TRUE),
+            sdAGB_Change = sd(AGB_Change, na.rm = TRUE),
+            nAGB_Change = n()) %>%
+  mutate(seAGB_Change = sdAGB_Change / sqrt(nAGB_Change),
+         lower.ciAGB_Change = mAGB_Change - qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change,
+         upper.ciAGB_Change = mAGB_Change + qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change)
+
+Plot_simulation_imputed75_output_ele <- rbind(Plot_simulation_imputed75_output_ele,Plot_simulation_imputed75_ele3)
+
+}
+
+Plot_simulation_imputed75_output_ele2 <- Plot_simulation_imputed75_output_ele %>% select(PercentRemoved, mAGB_Change)
+
+Plot_simulation_imputed75_ele25 <- t.test(Plot_simulation_imputed75_output_ele2[Plot_simulation_imputed75_output_ele2$PercentRemoved==25,])
+Plot_simulation_imputed75_ele50 <-t.test(Plot_simulation_imputed75_output_ele2[Plot_simulation_imputed75_output_ele2$PercentRemoved==50,])
+Plot_simulation_imputed75_ele100 <-t.test(Plot_simulation_imputed75_output_ele2[Plot_simulation_imputed75_output_ele2$PercentRemoved==100,])
+
+Plot_simulation_imputed75_ele_CI <- c(Plot_simulation_imputed75_ele25$estimate, Plot_simulation_imputed75_ele25$conf.int[1], Plot_simulation_imputed75_ele25$conf.int[2], 
+                        Plot_simulation_imputed75_ele50$estimate, Plot_simulation_imputed75_ele50$conf.int[1], Plot_simulation_imputed75_ele50$conf.int[2], 
+                        Plot_simulation_imputed75_ele100$estimate, Plot_simulation_imputed75_ele100$conf.int[1], Plot_simulation_imputed75_ele100$conf.int[2])
+
+#No Redundancy
+
+Plot_simulation_imputed75_output_ele_nr <- NULL
+
+for(i in 1:100){
+  Plot_simulation_imputed75_ele_nr2 <- Plot_simulation_imputed75_ele_nr %>% select(-X) %>% group_by(Plot, PercentRemoved) %>% slice_sample(n=1)
+Plot_simulation_imputed75_ele_nr3 <- Plot_simulation_imputed75_ele_nr2 %>% group_by(PercentRemoved) %>% 
+  summarise(mAGB_Change = mean(AGB_Change, na.rm = TRUE),
+            sdAGB_Change = sd(AGB_Change, na.rm = TRUE),
+            nAGB_Change = n()) %>%
+  mutate(seAGB_Change = sdAGB_Change / sqrt(nAGB_Change),
+         lower.ciAGB_Change = mAGB_Change - qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change,
+         upper.ciAGB_Change = mAGB_Change + qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change)
+
+Plot_simulation_imputed75_output_ele_nr <- rbind(Plot_simulation_imputed75_output_ele_nr,Plot_simulation_imputed75_ele_nr3)
+
+}
+
+Plot_simulation_imputed75_output_ele_nr2 <- Plot_simulation_imputed75_output_ele_nr %>% select(PercentRemoved, mAGB_Change)
+
+Plot_simulation_imputed75_ele_nr25 <- t.test(Plot_simulation_imputed75_output_ele_nr2[Plot_simulation_imputed75_output_ele_nr2$PercentRemoved==25,])
+Plot_simulation_imputed75_ele_nr50 <-t.test(Plot_simulation_imputed75_output_ele_nr2[Plot_simulation_imputed75_output_ele_nr2$PercentRemoved==50,])
+Plot_simulation_imputed75_ele_nr100 <-t.test(Plot_simulation_imputed75_output_ele_nr2[Plot_simulation_imputed75_output_ele_nr2$PercentRemoved==100,])
+
+Plot_simulation_imputed75_ele_nr_CI <- c(Plot_simulation_imputed75_ele_nr25$estimate, Plot_simulation_imputed75_ele_nr25$conf.int[1], Plot_simulation_imputed75_ele_nr25$conf.int[2], 
+                        Plot_simulation_imputed75_ele_nr50$estimate, Plot_simulation_imputed75_ele_nr50$conf.int[1], Plot_simulation_imputed75_ele_nr50$conf.int[2], 
+                        Plot_simulation_imputed75_ele_nr100$estimate, Plot_simulation_imputed75_ele_nr100$conf.int[1], Plot_simulation_imputed75_ele_nr100$conf.int[2])
+
+```
+
+```{r ape}
+#Redundancy
+
+Plot_simulation_imputed75_output_ape <- NULL
+
+for(i in 1:100){
+  Plot_simulation_imputed75_ape2 <- Plot_simulation_imputed75_ape %>% dplyr::select(-X) %>% group_by(Plot, PercentRemoved) %>% slice_sample(n=1)
+Plot_simulation_imputed75_ape3 <- Plot_simulation_imputed75_ape2 %>% group_by(PercentRemoved) %>% 
+  summarise(mAGB_Change = mean(AGB_Change, na.rm = TRUE),
+            sdAGB_Change = sd(AGB_Change, na.rm = TRUE),
+            nAGB_Change = n()) %>%
+  mutate(seAGB_Change = sdAGB_Change / sqrt(nAGB_Change),
+         lower.ciAGB_Change = mAGB_Change - qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change,
+         upper.ciAGB_Change = mAGB_Change + qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change)
+
+Plot_simulation_imputed75_output_ape <- rbind(Plot_simulation_imputed75_output_ape,Plot_simulation_imputed75_ape3)
+
+}
+
+Plot_simulation_imputed75_output_ape2 <- Plot_simulation_imputed75_output_ape %>% select(PercentRemoved, mAGB_Change)
+
+Plot_simulation_imputed75_ape25 <- t.test(Plot_simulation_imputed75_output_ape2[Plot_simulation_imputed75_output_ape2$PercentRemoved==25,])
+Plot_simulation_imputed75_ape50 <-t.test(Plot_simulation_imputed75_output_ape2[Plot_simulation_imputed75_output_ape2$PercentRemoved==50,])
+Plot_simulation_imputed75_ape100 <-t.test(Plot_simulation_imputed75_output_ape2[Plot_simulation_imputed75_output_ape2$PercentRemoved==100,])
+
+Plot_simulation_imputed75_ape_CI <- c(Plot_simulation_imputed75_ape25$estimate, Plot_simulation_imputed75_ape25$conf.int[1], Plot_simulation_imputed75_ape25$conf.int[2], 
+                        Plot_simulation_imputed75_ape50$estimate, Plot_simulation_imputed75_ape50$conf.int[1], Plot_simulation_imputed75_ape50$conf.int[2], 
+                        Plot_simulation_imputed75_ape100$estimate, Plot_simulation_imputed75_ape100$conf.int[1], Plot_simulation_imputed75_ape100$conf.int[2])
+
+#No Redundancy
+
+Plot_simulation_imputed75_output_ape_nr <- NULL
+
+for(i in 1:100){
+  Plot_simulation_imputed75_ape_nr2 <- Plot_simulation_imputed75_ape_nr %>% dplyr::select(-X) %>% group_by(Plot, PercentRemoved) %>% slice_sample(n=1)
+Plot_simulation_imputed75_ape_nr3 <- Plot_simulation_imputed75_ape_nr2 %>% group_by(PercentRemoved) %>% 
+  summarise(mAGB_Change = mean(AGB_Change, na.rm = TRUE),
+            sdAGB_Change = sd(AGB_Change, na.rm = TRUE),
+            nAGB_Change = n()) %>%
+  mutate(seAGB_Change = sdAGB_Change / sqrt(nAGB_Change),
+         lower.ciAGB_Change = mAGB_Change - qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change,
+         upper.ciAGB_Change = mAGB_Change + qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change)
+
+Plot_simulation_imputed75_output_ape_nr <- rbind(Plot_simulation_imputed75_output_ape_nr,Plot_simulation_imputed75_ape_nr3)
+
+}
+
+Plot_simulation_imputed75_output_ape_nr2 <- Plot_simulation_imputed75_output_ape_nr %>% select(PercentRemoved, mAGB_Change)
+
+Plot_simulation_imputed75_ape_nr25 <- t.test(Plot_simulation_imputed75_output_ape_nr2[Plot_simulation_imputed75_output_ape_nr2$PercentRemoved==25,])
+Plot_simulation_imputed75_ape_nr50 <-t.test(Plot_simulation_imputed75_output_ape_nr2[Plot_simulation_imputed75_output_ape_nr2$PercentRemoved==50,])
+Plot_simulation_imputed75_ape_nr100 <-t.test(Plot_simulation_imputed75_output_ape_nr2[Plot_simulation_imputed75_output_ape_nr2$PercentRemoved==100,])
+
+Plot_simulation_imputed75_ape_nr_CI <- c(Plot_simulation_imputed75_ape_nr25$estimate, Plot_simulation_imputed75_ape_nr25$conf.int[1], Plot_simulation_imputed75_ape_nr25$conf.int[2], 
+                        Plot_simulation_imputed75_ape_nr50$estimate, Plot_simulation_imputed75_ape_nr50$conf.int[1], Plot_simulation_imputed75_ape_nr50$conf.int[2], 
+                        Plot_simulation_imputed75_ape_nr100$estimate, Plot_simulation_imputed75_ape_nr100$conf.int[1], Plot_simulation_imputed75_ape_nr100$conf.int[2])
+
+```
+
+```{r Monkey}
+#Redundancy
+
+Plot_simulation_imputed75_output_monkey <- NULL
+
+for(i in 1:100){
+  Plot_simulation_imputed75_monkey2 <- Plot_simulation_imputed75_monkey %>% dplyr::select(-X) %>% group_by(Plot, PercentRemoved) %>% slice_sample(n=1)
+Plot_simulation_imputed75_monkey3 <- Plot_simulation_imputed75_monkey2 %>% group_by(PercentRemoved) %>% 
+  summarise(mAGB_Change = mean(AGB_Change, na.rm = TRUE),
+            sdAGB_Change = sd(AGB_Change, na.rm = TRUE),
+            nAGB_Change = n()) %>%
+  mutate(seAGB_Change = sdAGB_Change / sqrt(nAGB_Change),
+         lower.ciAGB_Change = mAGB_Change - qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change,
+         upper.ciAGB_Change = mAGB_Change + qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change)
+
+Plot_simulation_imputed75_output_monkey <- rbind(Plot_simulation_imputed75_output_monkey,Plot_simulation_imputed75_monkey3)
+
+}
+
+Plot_simulation_imputed75_output_monkey2 <- Plot_simulation_imputed75_output_monkey %>% select(PercentRemoved, mAGB_Change)
+
+Plot_simulation_imputed75_monkey25 <- t.test(Plot_simulation_imputed75_output_monkey2[Plot_simulation_imputed75_output_monkey2$PercentRemoved==25,])
+Plot_simulation_imputed75_monkey50 <-t.test(Plot_simulation_imputed75_output_monkey2[Plot_simulation_imputed75_output_monkey2$PercentRemoved==50,])
+Plot_simulation_imputed75_monkey100 <-t.test(Plot_simulation_imputed75_output_monkey2[Plot_simulation_imputed75_output_monkey2$PercentRemoved==100,])
+
+Plot_simulation_imputed75_monkey_CI <- c(Plot_simulation_imputed75_monkey25$estimate, Plot_simulation_imputed75_monkey25$conf.int[1], Plot_simulation_imputed75_monkey25$conf.int[2], 
+                        Plot_simulation_imputed75_monkey50$estimate, Plot_simulation_imputed75_monkey50$conf.int[1], Plot_simulation_imputed75_monkey50$conf.int[2], 
+                        Plot_simulation_imputed75_monkey100$estimate, Plot_simulation_imputed75_monkey100$conf.int[1], Plot_simulation_imputed75_monkey100$conf.int[2])
+
+#No Redundancy
+
+Plot_simulation_imputed75_output_monkey_nr <- NULL
+
+for(i in 1:100){
+  Plot_simulation_imputed75_monkey_nr2 <- Plot_simulation_imputed75_monkey_nr %>% dplyr::select(-X) %>% group_by(Plot, PercentRemoved) %>% slice_sample(n=1)
+Plot_simulation_imputed75_monkey_nr3 <- Plot_simulation_imputed75_monkey_nr2 %>% group_by(PercentRemoved) %>% 
+  summarise(mAGB_Change = mean(AGB_Change, na.rm = TRUE),
+            sdAGB_Change = sd(AGB_Change, na.rm = TRUE),
+            nAGB_Change = n()) %>%
+  mutate(seAGB_Change = sdAGB_Change / sqrt(nAGB_Change),
+         lower.ciAGB_Change = mAGB_Change - qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change,
+         upper.ciAGB_Change = mAGB_Change + qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change)
+
+Plot_simulation_imputed75_output_monkey_nr <- rbind(Plot_simulation_imputed75_output_monkey_nr,Plot_simulation_imputed75_monkey_nr3)
+
+}
+
+Plot_simulation_imputed75_output_monkey_nr2 <- Plot_simulation_imputed75_output_monkey_nr %>% select(PercentRemoved, mAGB_Change)
+
+Plot_simulation_imputed75_monkey_nr25 <- t.test(Plot_simulation_imputed75_output_monkey_nr2[Plot_simulation_imputed75_output_monkey_nr2$PercentRemoved==25,])
+Plot_simulation_imputed75_monkey_nr50 <-t.test(Plot_simulation_imputed75_output_monkey_nr2[Plot_simulation_imputed75_output_monkey_nr2$PercentRemoved==50,])
+Plot_simulation_imputed75_monkey_nr100 <-t.test(Plot_simulation_imputed75_output_monkey_nr2[Plot_simulation_imputed75_output_monkey_nr2$PercentRemoved==100,])
+
+Plot_simulation_imputed75_monkey_nr_CI <- c(Plot_simulation_imputed75_monkey_nr25$estimate, Plot_simulation_imputed75_monkey_nr25$conf.int[1], Plot_simulation_imputed75_monkey_nr25$conf.int[2], 
+                        Plot_simulation_imputed75_monkey_nr50$estimate, Plot_simulation_imputed75_monkey_nr50$conf.int[1], Plot_simulation_imputed75_monkey_nr50$conf.int[2], 
+                        Plot_simulation_imputed75_monkey_nr100$estimate, Plot_simulation_imputed75_monkey_nr100$conf.int[1], Plot_simulation_imputed75_monkey_nr100$conf.int[2])
+
+```
+
+```{r smam}
+#Redundancy
+
+Plot_simulation_imputed75_output_smam <- NULL
+
+for(i in 1:100){
+  Plot_simulation_imputed75_smam2 <- Plot_simulation_imputed75_smam %>% dplyr::select(-X) %>% group_by(Plot, PercentRemoved) %>% slice_sample(n=1)
+Plot_simulation_imputed75_smam3 <- Plot_simulation_imputed75_smam2 %>% group_by(PercentRemoved) %>% 
+  summarise(mAGB_Change = mean(AGB_Change, na.rm = TRUE),
+            sdAGB_Change = sd(AGB_Change, na.rm = TRUE),
+            nAGB_Change = n()) %>%
+  mutate(seAGB_Change = sdAGB_Change / sqrt(nAGB_Change),
+         lower.ciAGB_Change = mAGB_Change - qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change,
+         upper.ciAGB_Change = mAGB_Change + qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change)
+
+Plot_simulation_imputed75_output_smam <- rbind(Plot_simulation_imputed75_output_smam,Plot_simulation_imputed75_smam3)
+
+}
+
+Plot_simulation_imputed75_output_smam2 <- Plot_simulation_imputed75_output_smam %>% select(PercentRemoved, mAGB_Change)
+
+Plot_simulation_imputed75_smam25 <- t.test(Plot_simulation_imputed75_output_smam2[Plot_simulation_imputed75_output_smam2$PercentRemoved==25,])
+Plot_simulation_imputed75_smam50 <-t.test(Plot_simulation_imputed75_output_smam2[Plot_simulation_imputed75_output_smam2$PercentRemoved==50,])
+Plot_simulation_imputed75_smam100 <-t.test(Plot_simulation_imputed75_output_smam2[Plot_simulation_imputed75_output_smam2$PercentRemoved==100,])
+
+Plot_simulation_imputed75_smam_CI <- c(Plot_simulation_imputed75_smam25$estimate, Plot_simulation_imputed75_smam25$conf.int[1], Plot_simulation_imputed75_smam25$conf.int[2], 
+                        Plot_simulation_imputed75_smam50$estimate, Plot_simulation_imputed75_smam50$conf.int[1], Plot_simulation_imputed75_smam50$conf.int[2], 
+                        Plot_simulation_imputed75_smam100$estimate, Plot_simulation_imputed75_smam100$conf.int[1], Plot_simulation_imputed75_smam100$conf.int[2])
+
+#No Redundancy
+
+Plot_simulation_imputed75_output_smam_nr <- NULL
+
+for(i in 1:100){
+  Plot_simulation_imputed75_smam_nr2 <- Plot_simulation_imputed75_smam_nr %>% dplyr::select(-X) %>% group_by(Plot, PercentRemoved) %>% slice_sample(n=1)
+Plot_simulation_imputed75_smam_nr3 <- Plot_simulation_imputed75_smam_nr2 %>% group_by(PercentRemoved) %>% 
+  summarise(mAGB_Change = mean(AGB_Change, na.rm = TRUE),
+            sdAGB_Change = sd(AGB_Change, na.rm = TRUE),
+            nAGB_Change = n()) %>%
+  mutate(seAGB_Change = sdAGB_Change / sqrt(nAGB_Change),
+         lower.ciAGB_Change = mAGB_Change - qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change,
+         upper.ciAGB_Change = mAGB_Change + qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change)
+
+Plot_simulation_imputed75_output_smam_nr <- rbind(Plot_simulation_imputed75_output_smam_nr,Plot_simulation_imputed75_smam_nr3)
+
+}
+
+Plot_simulation_imputed75_output_smam_nr2 <- Plot_simulation_imputed75_output_smam_nr %>% select(PercentRemoved, mAGB_Change)
+
+Plot_simulation_imputed75_smam_nr25 <- t.test(Plot_simulation_imputed75_output_smam_nr2[Plot_simulation_imputed75_output_smam_nr2$PercentRemoved==25,])
+Plot_simulation_imputed75_smam_nr50 <-t.test(Plot_simulation_imputed75_output_smam_nr2[Plot_simulation_imputed75_output_smam_nr2$PercentRemoved==50,])
+Plot_simulation_imputed75_smam_nr100 <-t.test(Plot_simulation_imputed75_output_smam_nr2[Plot_simulation_imputed75_output_smam_nr2$PercentRemoved==100,])
+
+Plot_simulation_imputed75_smam_nr_CI <- c(Plot_simulation_imputed75_smam_nr25$estimate, Plot_simulation_imputed75_smam_nr25$conf.int[1], Plot_simulation_imputed75_smam_nr25$conf.int[2], 
+                        Plot_simulation_imputed75_smam_nr50$estimate, Plot_simulation_imputed75_smam_nr50$conf.int[1], Plot_simulation_imputed75_smam_nr50$conf.int[2], 
+                        Plot_simulation_imputed75_smam_nr100$estimate, Plot_simulation_imputed75_smam_nr100$conf.int[1], Plot_simulation_imputed75_smam_nr100$conf.int[2])
+
+```
+
+```{r ceph}
+#Redundancy
+
+Plot_simulation_imputed75_output_ceph <- NULL
+
+for(i in 1:100){
+  Plot_simulation_imputed75_ceph2 <- Plot_simulation_imputed75_ceph %>% dplyr::select(-X) %>% group_by(Plot, PercentRemoved) %>% slice_sample(n=1)
+Plot_simulation_imputed75_ceph3 <- Plot_simulation_imputed75_ceph2 %>% group_by(PercentRemoved) %>% 
+  summarise(mAGB_Change = mean(AGB_Change, na.rm = TRUE),
+            sdAGB_Change = sd(AGB_Change, na.rm = TRUE),
+            nAGB_Change = n()) %>%
+  mutate(seAGB_Change = sdAGB_Change / sqrt(nAGB_Change),
+         lower.ciAGB_Change = mAGB_Change - qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change,
+         upper.ciAGB_Change = mAGB_Change + qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change)
+
+Plot_simulation_imputed75_output_ceph <- rbind(Plot_simulation_imputed75_output_ceph,Plot_simulation_imputed75_ceph3)
+
+}
+
+Plot_simulation_imputed75_output_ceph2 <- Plot_simulation_imputed75_output_ceph %>% select(PercentRemoved, mAGB_Change)
+
+Plot_simulation_imputed75_ceph25 <- t.test(Plot_simulation_imputed75_output_ceph2[Plot_simulation_imputed75_output_ceph2$PercentRemoved==25,])
+Plot_simulation_imputed75_ceph50 <-t.test(Plot_simulation_imputed75_output_ceph2[Plot_simulation_imputed75_output_ceph2$PercentRemoved==50,])
+Plot_simulation_imputed75_ceph100 <-t.test(Plot_simulation_imputed75_output_ceph2[Plot_simulation_imputed75_output_ceph2$PercentRemoved==100,])
+
+Plot_simulation_imputed75_ceph_CI <- c(Plot_simulation_imputed75_ceph25$estimate, Plot_simulation_imputed75_ceph25$conf.int[1], Plot_simulation_imputed75_ceph25$conf.int[2], 
+                        Plot_simulation_imputed75_ceph50$estimate, Plot_simulation_imputed75_ceph50$conf.int[1], Plot_simulation_imputed75_ceph50$conf.int[2], 
+                        Plot_simulation_imputed75_ceph100$estimate, Plot_simulation_imputed75_ceph100$conf.int[1], Plot_simulation_imputed75_ceph100$conf.int[2])
+
+#No Redundancy
+
+Plot_simulation_imputed75_output_ceph_nr <- NULL
+
+for(i in 1:100){
+  Plot_simulation_imputed75_ceph_nr2 <- Plot_simulation_imputed75_ceph_nr %>% dplyr::select(-X) %>% group_by(Plot, PercentRemoved) %>% slice_sample(n=1)
+Plot_simulation_imputed75_ceph_nr3 <- Plot_simulation_imputed75_ceph_nr2 %>% group_by(PercentRemoved) %>% 
+  summarise(mAGB_Change = mean(AGB_Change, na.rm = TRUE),
+            sdAGB_Change = sd(AGB_Change, na.rm = TRUE),
+            nAGB_Change = n()) %>%
+  mutate(seAGB_Change = sdAGB_Change / sqrt(nAGB_Change),
+         lower.ciAGB_Change = mAGB_Change - qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change,
+         upper.ciAGB_Change = mAGB_Change + qt(1 - (0.05 / 2), nAGB_Change - 1) * seAGB_Change)
+
+Plot_simulation_imputed75_output_ceph_nr <- rbind(Plot_simulation_imputed75_output_ceph_nr,Plot_simulation_imputed75_ceph_nr3)
+
+}
+
+Plot_simulation_imputed75_output_ceph_nr2 <- Plot_simulation_imputed75_output_ceph_nr %>% select(PercentRemoved, mAGB_Change)
+
+Plot_simulation_imputed75_ceph_nr25 <- t.test(Plot_simulation_imputed75_output_ceph_nr2[Plot_simulation_imputed75_output_ceph_nr2$PercentRemoved==25,])
+Plot_simulation_imputed75_ceph_nr50 <-t.test(Plot_simulation_imputed75_output_ceph_nr2[Plot_simulation_imputed75_output_ceph_nr2$PercentRemoved==50,])
+Plot_simulation_imputed75_ceph_nr100 <-t.test(Plot_simulation_imputed75_output_ceph_nr2[Plot_simulation_imputed75_output_ceph_nr2$PercentRemoved==100,])
+
+Plot_simulation_imputed75_ceph_nr_CI <- c(Plot_simulation_imputed75_ceph_nr25$estimate, Plot_simulation_imputed75_ceph_nr25$conf.int[1], Plot_simulation_imputed75_ceph_nr25$conf.int[2], 
+                        Plot_simulation_imputed75_ceph_nr50$estimate, Plot_simulation_imputed75_ceph_nr50$conf.int[1], Plot_simulation_imputed75_ceph_nr50$conf.int[2], 
+                        Plot_simulation_imputed75_ceph_nr100$estimate, Plot_simulation_imputed75_ceph_nr100$conf.int[1], Plot_simulation_imputed75_ceph_nr100$conf.int[2])
+
+```
+
+
+OBSERVED NETWORK DATA COMPILATION
+```{r Dataframe Compilation}
+
+Plot_simulation_total_CI <- c(Plot_simulation_CI, Plot_simulation_ele_CI, Plot_simulation_ape_CI, Plot_simulation_monkey_CI, Plot_simulation_ceph_CI,  Plot_simulation_smam_CI, 
+                    Plot_simulation_CI_nr, Plot_simulation_ele_nr_CI, Plot_simulation_ape_nr_CI,Plot_simulation_monkey_nr_CI, Plot_simulation_ceph_nr_CI,  Plot_simulation_smam_nr_CI)
+
+Taxa1 <- c(rep("Total", each=9), rep("Elephant", each=9), rep("Ape", each=9), rep("Monkey", each=9), rep("Duiker", each=9), rep("Rodent", each=9))
+Taxa <- c(rep(Taxa1, times=2))
+
+Value <- c(rep(c("Mean", "Lower", "Upper"), times=36))
+
+PercentRemoved <- c(rep(c(25, 25, 25, 50, 50, 50, 100, 100, 100), times=12))
+
+DietaryRedundancy <- rep(c("Yes", "No"), each =54)
+
+Plot_simulation_total_CI_df <- as.data.frame(cbind(Plot_simulation_total_CI, Taxa, Value, PercentRemoved, DietaryRedundancy))
+
+sim_df <- Plot_simulation_total_CI_df %>% pivot_wider(names_from=Value, values_from=Plot_simulation_total_CI)
+sim_df$Mean <- as.numeric(sim_df$Mean)
+sim_df$Lower <- as.numeric(sim_df$Lower)
+sim_df$Upper <- as.numeric(sim_df$Upper)
+sim_df <- sim_df%>% rename(PercentFaunalDegradation= PercentRemoved)
+
+library(ggplot2)
+observed_fig <- ggplot(sim_df, aes(x=factor(Taxa, levels=c("Rodent", "Duiker","Monkey", "Ape", "Elephant", "Total")), y=Mean, fill=factor(PercentFaunalDegradation, levels=c("100", "50", "25")), alpha=DietaryRedundancy)) +
+    geom_bar(position=position_dodge(.9), stat="identity") +
+    geom_errorbar(position=position_dodge(.9), width=.25, aes(ymin=Lower, ymax=Upper)) +
+    theme_classic() +
+    geom_hline(yintercept=0, linetype="longdash") +
+  ylab("Mean AGB Change (kg/ha)")+ 
+  scale_fill_manual(name = "Faunal Degradation (%)", values=c("#E69F00","#56B4E9", "#009E73"))+
+  xlab("Taxa")+
+  guides(colour = guide_legend(override.aes = list(alpha = 0.5)))+
+   scale_alpha_manual(name="Dietary Redundancy",values=c(0.3, 1))+ 
+  coord_flip()
+
+
+
+```
+
+IMPUTED NETWORK DATA COMPILATION --- EXPERT SCENARIO
+```{r Dataframe Compilation}
+Plot_simulation_imputed_total_CI <- c(Plot_simulation_imputed_CI, Plot_simulation_imputed_ele_CI, Plot_simulation_imputed_ape_CI, Plot_simulation_imputed_monkey_CI, Plot_simulation_imputed_smam_CI, Plot_simulation_imputed_ceph_CI, 
+                    Plot_simulation_imputed_CI_nr, Plot_simulation_imputed_ele_nr_CI, Plot_simulation_imputed_ape_nr_CI,Plot_simulation_imputed_monkey_nr_CI,Plot_simulation_imputed_smam_nr_CI,Plot_simulation_imputed_ceph_nr_CI)
+
+Taxa1 <- c(rep("Total", each=9), rep("Elephant", each=9), rep("Ape", each=9), rep("Monkey", each=9), rep("Rodent", each=9), rep("Duiker", each=9))
+Taxa <- c(rep(Taxa1, times=2))
+
+Value <- c(rep(c("Mean", "Lower", "Upper"), times=36))
+
+PercentRemoved <- c(rep(c(25, 25, 25, 50, 50, 50, 100, 100, 100), times=12))
+
+DietaryRedundancy <- rep(c("Yes", "No"), each =54)
+
+Plot_simulation_imputed_total_CI_df <- as.data.frame(cbind(Plot_simulation_imputed_total_CI, Taxa, Value, PercentRemoved, DietaryRedundancy))
+
+sim_df_imputed <- Plot_simulation_imputed_total_CI_df %>% pivot_wider(names_from=Value, values_from=Plot_simulation_imputed_total_CI)
+sim_df_imputed$Mean <- as.numeric(sim_df_imputed$Mean)
+sim_df_imputed$Lower <- as.numeric(sim_df_imputed$Lower)
+sim_df_imputed$Upper <- as.numeric(sim_df_imputed$Upper)
+sim_df_imputed <- sim_df_imputed%>% rename(PercentFaunalDegradation= PercentRemoved)
+
+library(ggplot2)
+imputed_fig <- ggplot(sim_df_imputed, aes(x=factor(Taxa, levels=c("Rodent","Duiker", "Monkey", "Ape", "Elephant", "Total")), y=Mean, fill=factor(PercentFaunalDegradation, levels=c("100", "50", "25")), alpha=DietaryRedundancy)) +
+    geom_bar(position=position_dodge(.9), stat="identity") +
+    geom_errorbar(position=position_dodge(.9), width=.25, aes(ymin=Lower, ymax=Upper)) +
+    theme_classic() +
+    geom_hline(yintercept=0, linetype="longdash") +
+  ylab("Mean AGB Change (kg/ha)")+ 
+  scale_fill_manual(name = "Faunal Degradation (%)", values=c("#E69F00","#56B4E9", "#009E73"))+
+  xlab("Taxa")+
+  guides(colour = guide_legend(override.aes = list(alpha = 0.5)))+
+   scale_alpha_manual(name="Dietary Redundancy",values=c(0.3, 1))+ 
+  coord_flip()
+
+library(ggpubr)
+ggarrange(observed_fig, imputed_fig)
+```
+
+IMPUTED NETWORK DATA COMPILATION --- 1/75 SCENARIO
+```{r Dataframe Compilation}
+Plot_simulation_imputed75_total_CI <- c(Plot_simulation_imputed75_CI, Plot_simulation_imputed75_ele_CI, Plot_simulation_imputed75_ape_CI, Plot_simulation_imputed75_monkey_CI, Plot_simulation_imputed75_smam_CI, Plot_simulation_imputed75_ceph_CI, 
+                    Plot_simulation_imputed75_CI_nr, Plot_simulation_imputed75_ele_nr_CI, Plot_simulation_imputed75_ape_nr_CI,Plot_simulation_imputed75_monkey_nr_CI,Plot_simulation_imputed75_smam_nr_CI,Plot_simulation_imputed75_ceph_nr_CI)
+
+Taxa1 <- c(rep("Total", each=9), rep("Elephant", each=9), rep("Ape", each=9), rep("Monkey", each=9), rep("Rodent", each=9), rep("Duiker", each=9))
+Taxa <- c(rep(Taxa1, times=2))
+
+Value <- c(rep(c("Mean", "Lower", "Upper"), times=36))
+
+PercentRemoved <- c(rep(c(25, 25, 25, 50, 50, 50, 100, 100, 100), times=12))
+
+DietaryRedundancy <- rep(c("Yes", "No"), each =54)
+
+Plot_simulation_imputed75_total_CI_df <- as.data.frame(cbind(Plot_simulation_imputed75_total_CI, Taxa, Value, PercentRemoved, DietaryRedundancy))
+
+sim_df_imputed75 <- Plot_simulation_imputed75_total_CI_df %>% pivot_wider(names_from=Value, values_from=Plot_simulation_imputed75_total_CI)
+sim_df_imputed75$Mean <- as.numeric(sim_df_imputed75$Mean)
+sim_df_imputed75$Lower <- as.numeric(sim_df_imputed75$Lower)
+sim_df_imputed75$Upper <- as.numeric(sim_df_imputed75$Upper)
+sim_df_imputed75 <- sim_df_imputed75%>% rename(PercentFaunalDegradation= PercentRemoved)
+
+library(ggplot2)
+imputed75_fig <- ggplot(sim_df_imputed75, aes(x=factor(Taxa, levels=c("Rodent","Duiker", "Monkey", "Ape", "Elephant", "Total")), y=Mean, fill=factor(PercentFaunalDegradation, levels=c("100", "50", "25")), alpha=DietaryRedundancy)) +
+    geom_bar(position=position_dodge(.9), stat="identity") +
+    geom_errorbar(position=position_dodge(.9), width=.25, aes(ymin=Lower, ymax=Upper)) +
+    theme_classic() +
+    geom_hline(yintercept=0, linetype="longdash") +
+  ylab("Mean AGB Change (kg/ha)")+ 
+  scale_fill_manual(name = "Faunal Degradation (%)", values=c("#E69F00","#56B4E9", "#009E73"))+
+  xlab("Taxa")+
+  guides(colour = guide_legend(override.aes = list(alpha = 0.5)))+
+   scale_alpha_manual(name="Dietary Redundancy",values=c(0.3, 1))+ 
+  coord_flip()
+
+library(ggpubr)
+ggarrange(imputed_fig, imputed75_fig)
+
+```
+
+
+TOTAL DATA COMPILATION
+```{r Dataframe Compilation}
+sim_df_imputed$Model <- "Imputed"
+sim_df$Model <- "Observed"
+sim_df_total <- rbind(sim_df, sim_df_imputed)
+
+write.csv(sim_df_total, "Data/sim_df_total.csv")
+
+#sim_df_total <- read.csv("Data/sim_df_total.csv")
+
+sim_df_total$SimulationType <- paste(sim_df_total$Model,sim_df_total$DietaryRedundancy)
+sim_df_total$SimulationType[sim_df_total$SimulationType=="Observed Yes"] <- "Observed, Compensation"
+sim_df_total$SimulationType[sim_df_total$SimulationType=="Observed No"] <- "Observed, No Compensation"
+sim_df_total$SimulationType[sim_df_total$SimulationType=="Imputed Yes"] <- "Imputed, Compensation"
+sim_df_total$SimulationType[sim_df_total$SimulationType=="Imputed No"] <- "Imputed, No Compensation"
+
+#comparing observed and imputed expert
+total_fig <- ggplot(sim_df_total, aes(x=factor(Taxa, levels=c("Rodent","Duiker", "Monkey", "Ape", "Elephant", "Total")), y=Mean, fill=SimulationType)) +
+    geom_bar(position=position_dodge(.9), stat="identity") +
+    geom_errorbar(position=position_dodge(.9), width=.25, aes(ymin=Lower, ymax=Upper)) +
+    theme_classic() +
+    geom_hline(yintercept=0, linetype="longdash") +
+  ylab("Mean AGB Change (kg/ha)")+ 
+  scale_fill_manual(name = "Simulation Type", values=c("deepskyblue3","lightskyblue1","gray50","gray80"))+
+  xlab("Taxa")+
+  coord_flip()+
+  facet_wrap(~factor(PercentFaunalDegradation, levels=c("25", "50", "100")))
+
+sim_df_imputed75$Model <- "1/75"
+sim_df_total2 <- rbind(sim_df_imputed75, sim_df_imputed)
+sim_df_total2$Model[sim_df_total2$Model=="Imputed"] <- "Expert"
+
+sim_df_imputed75$Mean <- round(sim_df_imputed75$Mean, digits = 0)
+sim_df_imputed75$Lower <- round(sim_df_imputed75$Lower, digits = 0)
+sim_df_imputed75$Upper <- round(sim_df_imputed75$Upper, digits = 0)
+
+write.csv(sim_df_imputed75, "~/Documents/GitHub/FaunalDegradationAGB/Outputs/SimulationSummaryimputed75.csv")
+
+sim_df_total2$SimulationType <- paste(sim_df_total2$Model,sim_df_total$DietaryRedundancy)
+sim_df_total2$SimulationType[sim_df_total2$SimulationType=="1/75 Yes"] <- "1/75, Compensation"
+sim_df_total2$SimulationType[sim_df_total2$SimulationType=="1/75 No"] <- "1/75, No Compensation"
+sim_df_total2$SimulationType[sim_df_total2$SimulationType=="Expert Yes"] <- "Expert, Compensation"
+sim_df_total2$SimulationType[sim_df_total2$SimulationType=="Expert No"] <- "Expert, No Compensation"
+
+#comparing imputed expert with imputed 1/75
+supp_fig <- ggplot(sim_df_total2, aes(x=factor(Taxa, levels=c("Rodent","Duiker", "Monkey", "Ape", "Elephant", "Total")), y=Mean, fill=SimulationType)) +
+    geom_bar(position=position_dodge(.9), stat="identity") +
+    geom_errorbar(position=position_dodge(.9), width=.25, aes(ymin=Lower, ymax=Upper)) +
+    theme_classic() +
+    geom_hline(yintercept=0, linetype="longdash") +
+  ylab("Mean AGB Change (kg/ha)")+ 
+  scale_fill_manual(name = "Simulation Type", values=c("darkorchid4","#CC99FF",  "deepskyblue3","lightskyblue1"))+
+  xlab("Taxa")+
+  coord_flip()+
+  facet_wrap(~factor(PercentFaunalDegradation, levels=c("25", "50", "100")))
+
+sim_df_total2 <- sim_df_total
+sim_df_total2$Mean <- round(sim_df_total2$Mean, digits = 0)
+sim_df_total2$Lower <- round(sim_df_total2$Lower, digits = 0)
+sim_df_total2$Upper <- round(sim_df_total2$Upper, digits = 0)
+write.csv(sim_df_total2, "~/Documents/GitHub/FaunalDegradationAGB/Outputs/SimulationSummary.csv")
+  
+```
+
