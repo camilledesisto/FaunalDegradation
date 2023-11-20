@@ -49,7 +49,6 @@ simdat_smam_nr <- read.csv("/Users/camilledesisto/Documents/GitHub/FaunalDegrada
 
 ```
 
-
 ```{r Organize Data Frames}
 #Imputed Network
 simdat_ele$Taxa <- "Elephant"
@@ -113,7 +112,6 @@ simdat_total_nr2$AGB <- simdat_total_nr2$AGB * -1
 simdat_total_nr2$Succession[simdat_total_nr2$Succession=="Primaire"] <- "aPrimaire"
 
 ```
-
 
 ```{r Organize Data Frames}
 #Observed Network
@@ -449,7 +447,6 @@ confint_all$VariableType[confint_all$Variable=="Secondary Forest"] <-"Anthropoge
 
 ```
 
-
 ```{r Total Dataframe Compilation}
 #Observed Network
 confint_obs_r <- rbind(confint_total_obs, confint_ele_obs, confint_ape_obs, confint_monkey_obs, confint_smam_obs, confint_ceph_obs)
@@ -564,7 +561,6 @@ confint_obs$VariableType[confint_obs$Variable=="Precipitation"] <-"Natural"
 confint_obs$VariableType[confint_obs$Variable=="Secondary Forest"] <-"Anthropogenic"
 ```
 
-
 ```{r}
 confint_both <- rbind(confint_all, confint_obs)
 colnames(confint_both)[8]<- "Variable Type"
@@ -580,7 +576,7 @@ total_plot <- ggplot(data=confint_both_new[confint_both_new$Taxa=="Total",], aes
   geom_point(position=position_dodge(.7),aes(y=Estimate, color=Network, shape=`Variable Type`), size=3)+
   scale_color_manual(name="Model Type", values=c("deepskyblue3", "gray50"))+
   theme_classic()+
-  geom_hline(yintercept = 0)+
+  geom_hline(yintercept = 0, linetype="dashed")+
   coord_flip()+
   xlab("Variable")+ 
   ylab("ABG Loss (kg/ha)")
@@ -590,7 +586,7 @@ ele_plot <- ggplot(data=confint_both[confint_both$Taxa=="Elephant",], aes(x= fac
   geom_point(position=position_dodge(.7),aes(y=Estimate, color=Network, shape=`Variable Type`), size=2)+
   scale_color_manual(name="Model Type", values=c("deepskyblue3","lightskyblue",  "gray50",  "gray80"))+
   theme_classic()+
-  geom_hline(yintercept = 0)+
+  geom_hline(yintercept = 0, linetype="dashed")+
   coord_flip()+
   xlab("Variable")+ 
   ylab("ABG Loss (kg/ha)")
@@ -600,7 +596,7 @@ ape_plot <- ggplot(data=confint_both[confint_both$Taxa=="Ape",], aes(x= factor(V
   geom_point(position=position_dodge(.7),aes(y=Estimate, color=Network, shape=`Variable Type`), size=2)+
   scale_color_manual(name="Model Type", values=c("deepskyblue3","lightskyblue",  "gray50",  "gray80"))+
   theme_classic()+
-  geom_hline(yintercept = 0)+
+  geom_hline(yintercept = 0, linetype="dashed")+
   coord_flip()+
   xlab("Variable")+ 
   ylab("ABG Loss (kg/ha)")
@@ -610,7 +606,7 @@ monkey_plot <- ggplot(data=confint_both[confint_both$Taxa=="Monkey",], aes(x= fa
   geom_point(position=position_dodge(.7),aes(y=Estimate, color=Network, shape=`Variable Type`), size=2)+
   scale_color_manual(name="Model Type", values=c("deepskyblue3","lightskyblue",  "gray50",  "gray80"))+
   theme_classic()+
-  geom_hline(yintercept = 0)+
+  geom_hline(yintercept = 0, linetype="dashed")+
   coord_flip()+
   xlab("Variable")+ 
   ylab("ABG Loss (kg/ha)")
@@ -620,7 +616,7 @@ ceph_plot <- ggplot(data=confint_both[confint_both$Taxa=="Duiker",], aes(x= fact
   geom_point(position=position_dodge(.7),aes(y=Estimate, color=Network, shape=`Variable Type`), size=2)+
   scale_color_manual(name="Model Type", values=c("deepskyblue3","lightskyblue",  "gray50",  "gray80"))+
   theme_classic()+
-  geom_hline(yintercept = 0)+
+  geom_hline(yintercept = 0, linetype="dashed")+
   coord_flip()+
   xlab("Variable")+ 
   ylab("ABG Loss (kg/ha)")
@@ -630,7 +626,7 @@ smam_plot <- ggplot(data=confint_both[confint_both$Taxa=="Rodent",], aes(x= fact
   geom_point(position=position_dodge(.7),aes(y=Estimate, color=Network, shape=`Variable Type`), size=2)+
   scale_color_manual(name="Model Type", values=c("deepskyblue3","lightskyblue",  "gray50",  "gray80"))+
   theme_classic()+
-  geom_hline(yintercept = 0)+
+  geom_hline(yintercept = 0, linetype="dashed")+
   coord_flip()+
   xlab("Variable")+ 
   ylab("ABG Loss (kg/ha)")

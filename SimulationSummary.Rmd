@@ -1285,8 +1285,10 @@ sim_df_total$SimulationType[sim_df_total$SimulationType=="Observed No"] <- "Obse
 sim_df_total$SimulationType[sim_df_total$SimulationType=="Imputed Yes"] <- "Imputed, Compensation"
 sim_df_total$SimulationType[sim_df_total$SimulationType=="Imputed No"] <- "Imputed, No Compensation"
 
+sim_df_total$Taxa[sim_df_total$Taxa=="Total"] <- "All Taxa"
+
 #comparing observed and imputed expert
-total_fig <- ggplot(sim_df_total, aes(x=factor(Taxa, levels=c("Rodent","Duiker", "Monkey", "Ape", "Elephant", "Total")), y=Mean, fill=SimulationType)) +
+total_fig <- ggplot(sim_df_total, aes(x=factor(Taxa, levels=c("Rodent","Duiker", "Monkey", "Ape", "Elephant", "All Taxa")), y=Mean, fill=SimulationType)) +
     geom_bar(position=position_dodge(.9), stat="identity") +
     geom_errorbar(position=position_dodge(.9), width=.25, aes(ymin=Lower, ymax=Upper)) +
     theme_classic() +
